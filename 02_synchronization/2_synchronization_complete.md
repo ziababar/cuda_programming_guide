@@ -2,7 +2,7 @@
 
 Synchronization is the cornerstone of parallel programming in CUDA. Understanding how threads coordinate, share data safely, and maintain consistency is essential for writing correct and efficient GPU applications.
 
-** [Back to Overview](1_cuda_execution_model_overview.md)** | ** Previous: [Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md)** | ** Next: [Execution Constraints Guide](1e_execution_constraints_guide.md)**
+** [Back to Execution Model](../01_execution_model/1_cuda_execution_model_overview.md)** | ** Previous: [Streaming Multiprocessors Guide](../01_execution_model/1c_streaming_multiprocessors_deep.md)** | ** Next: [Memory Hierarchy](../03_memory_hierarchy/2_cuda_memory_hierarchy_overview.md)**
 
 ---
 

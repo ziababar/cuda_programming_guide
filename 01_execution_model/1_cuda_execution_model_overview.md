@@ -8,9 +8,8 @@ Understanding the CUDA execution model is **essential** for writing performant G
 - **[ Thread Hierarchy Complete Guide](1a_thread_hierarchy_complete.md)** - Thread/Block/Grid organization, indexing patterns, dimensionality choices
 - **[ Warp Execution Advanced Guide](1b_warp_execution_advanced.md)** - SIMT model, divergence optimization, warp intrinsics, debugging
 - **[ Streaming Multiprocessors Deep Dive](1c_streaming_multiprocessors_deep.md)** - SM architecture, scheduling, occupancy tuning, resource management
-- **[ Synchronization Complete Guide](1d_synchronization_complete.md)** - Thread barriers, cooperative groups, race condition prevention
+- **[ Synchronization Complete Guide](../02_synchronization/2_synchronization_complete.md)** - Thread barriers, cooperative groups, race condition prevention
 - **[ Execution Constraints Guide](1e_execution_constraints_guide.md)** - Hardware limits, resource tradeoffs, launch configuration validation
-- **[ Performance Examples](1f_performance_examples.md)** - Matrix multiplication case study, optimization patterns, real-world applications
 
 ---
 
