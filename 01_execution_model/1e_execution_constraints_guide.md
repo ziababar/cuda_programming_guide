@@ -2,7 +2,7 @@
 
 Understanding CUDA's execution constraints is crucial for writing efficient and correct GPU applications. These constraints arise from hardware limitations, resource management, and architectural design choices.
 
-** [Back to Overview](1_cuda_execution_model_overview.md)** | ** Previous: [Synchronization Guide](1d_synchronization_complete.md)** | ** Next: [Performance Examples](1f_performance_examples.md)**
+**[Back to Overview](1_cuda_execution_model.md)** | **Previous: [Synchronization Guide](../02_synchronization/2_synchronization.md)** | **Next: [Performance Examples](1f_performance_examples.md)**
 
 ---
 
@@ -1377,9 +1377,9 @@ void analyze_kernel_constraints() {
 ##  **Related Guides**
 
 - **Next Step**: [ Performance Examples](1f_performance_examples.md) - Real-world optimization case studies
-- **Foundation**: [ Synchronization Guide](1d_synchronization_complete.md) - Thread coordination patterns
+- **Foundation**: [Synchronization Guide](../02_synchronization/2_synchronization.md) - Thread coordination patterns
 - **Architecture**: [ Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md) - SM resource management
-- **Overview**: [ Execution Model Overview](1_cuda_execution_model_overview.md) - Quick reference and navigation
+- **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
 

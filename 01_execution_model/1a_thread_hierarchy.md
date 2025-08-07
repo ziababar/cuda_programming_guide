@@ -2,7 +2,7 @@
 
 The CUDA thread hierarchy is the foundation of GPU parallel programming. Understanding how threads, warps, blocks, and grids work together is essential for writing efficient kernels and avoiding common pitfalls.
 
-** [Back to Overview](1_cuda_execution_model_overview.md)** | ** Next: [Warp Execution Guide](1b_warp_execution_advanced.md)**
+**[Back to Overview](1_cuda_execution_model.md)** | **Next: [Warp Execution Guide](1b_warp_execution.md)**
 
 ---
 
@@ -1259,10 +1259,10 @@ __device__ float detect_corner_harris(float* image, int width, int height,
 
 ##  **Related Guides**
 
-- **Next Step**: [ Warp Execution Advanced Guide](1b_warp_execution_advanced.md) - Master SIMT execution
+- **Next Step**: [ Warp Execution Advanced Guide](1b_warp_execution.md) - Master SIMT execution
 - **Performance**: [ Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md) - Optimize SM utilization
-- **Coordination**: [ Synchronization Guide](../02_synchronization/2_synchronization_complete.md) - Thread cooperation patterns
-- **Overview**: [ Execution Model Overview](1_cuda_execution_model_overview.md) - Quick reference and navigation
+- **Coordination**: [Synchronization Guide](../02_synchronization/2_synchronization.md) - Thread cooperation patterns
+- **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
 

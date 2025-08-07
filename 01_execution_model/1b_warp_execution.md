@@ -2,7 +2,7 @@
 
 Understanding warp execution is crucial for writing high-performance CUDA kernels. Warps are the fundamental execution unit in CUDA's SIMT (Single Instruction, Multiple Thread) model, and mastering their behavior is key to GPU optimization.
 
-** [Back to Overview](1_cuda_execution_model_overview.md)** | ** Previous: [Thread Hierarchy Guide](1a_thread_hierarchy_complete.md)** | ** Next: [Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md)**
+** [Back to Overview](1_cuda_execution_model.md)** | ** Previous: [Thread Hierarchy Guide](1a_thread_hierarchy.md)** | ** Next: [Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md)**
 
 ---
 
@@ -1214,9 +1214,9 @@ __global__ void update_particles_warp_optimized(Particle* particles,
 ##  **Related Guides**
 
 - **Next Step**: [ Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md) - Understand SM architecture and scheduling
-- **Foundation**: [ Thread Hierarchy Guide](1a_thread_hierarchy_complete.md) - Thread organization fundamentals
-- **Coordination**: [ Synchronization Guide](1d_synchronization_complete.md) - Thread cooperation beyond warps
-- **Overview**: [ Execution Model Overview](1_cuda_execution_model_overview.md) - Quick reference and navigation
+- **Foundation**: [ Thread Hierarchy Guide](1a_thread_hierarchy.md) - Thread organization fundamentals
+- **Coordination**: [Synchronization Guide](../02_synchronization/2_synchronization.md) - Thread cooperation beyond warps
+- **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
 

@@ -4,7 +4,7 @@ Thread synchronization is a fundamental aspect of parallel programming in CUDA. 
 
 ## Navigation Guide
 
-### **[Synchronization Complete Guide](2_synchronization_complete.md)** - Comprehensive synchronization reference
+### **[Synchronization Complete Guide](2_synchronization.md)** - Comprehensive synchronization reference
 - Block-level synchronization
 - Warp-level synchronization  
 - Grid-level coordination
