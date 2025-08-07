@@ -1,6 +1,6 @@
-# 📈 CUDA Profiling & Optimization – Deep Dive
+#  CUDA Profiling & Optimization – Deep Dive
 
-## 1. 🧰 Key Profiling Tools
+## 1.  Key Profiling Tools
 
 | Tool               | Description                                                                                          | Use Cases                                                                 |
 |--------------------|------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
@@ -12,36 +12,36 @@
 
 ---
 
-### 🔍 Tips for Tool Usage
+###  Tips for Tool Usage
 
-- 🧠 **Start with Nsight Systems** to find **where** bottlenecks occur (e.g. CPU wait time, GPU idle).
-- 🔬 Use **Nsight Compute** to find **why** a kernel is underperforming (e.g. low occupancy, warp divergence).
-- 🛡️ Always run **cuda-memcheck** before tuning for performance — correctness comes first.
-- 🐞 Use **cuda-gdb** to diagnose crashes or logic errors in device code when print-style debugging fails.
+-  **Start with Nsight Systems** to find **where** bottlenecks occur (e.g. CPU wait time, GPU idle).
+-  Use **Nsight Compute** to find **why** a kernel is underperforming (e.g. low occupancy, warp divergence).
+-  Always run **cuda-memcheck** before tuning for performance — correctness comes first.
+-  Use **cuda-gdb** to diagnose crashes or logic errors in device code when print-style debugging fails.
 
 
 
-## 2. 📊 Nsight Systems – Timeline Debugging
+## 2.  Nsight Systems – Timeline Debugging
 
 `Nsight Systems` provides a **top-down, system-wide view** of your application. It captures CPU, GPU, memory, and OS interactions in a **timeline-based UI**, making it ideal for analyzing bottlenecks related to synchronization, concurrency, and data transfers.
 
 
-### ✅ Use Cases
+###  Use Cases
 
-- 🔁 **Stream Concurrency**  
+-  **Stream Concurrency**
   Visualize how multiple CUDA streams overlap. Helps you confirm whether your compute and memory operations run in parallel or serialize unnecessarily.
 
-- 🧱 **Serialization Detection**  
+-  **Serialization Detection**
   Detect if memory copies and kernels are serialized on the same stream due to dependencies or poor stream usage.
 
-- 🔄 **CPU–GPU Sync Bottlenecks**  
+-  **CPU–GPU Sync Bottlenecks**
   Identify `cudaMemcpy` or `cudaDeviceSynchronize()` calls that block CPU threads while waiting on the GPU. Look for gaps between kernel launches and compute.
 
-- 🧪 **Multi-GPU Workload Analysis**  
+-  **Multi-GPU Workload Analysis**
   Evaluate load balancing across GPUs in multi-GPU systems. See whether each GPU is fully utilized and identify synchronization overhead.
 
 
-### 📊 Key Metrics & Events
+###  Key Metrics & Events
 
 | Metric/Event             | What It Tells You                                                    |
 |--------------------------|----------------------------------------------------------------------|
@@ -53,48 +53,48 @@
 | **NVTX Markers**          | Annotate timeline with custom labels (e.g. per frame, phase, step).  |
 
 
-### 🧠 Best Practices
+###  Best Practices
 
 - Use **CUDA events and NVTX ranges** to annotate key sections of your code. This enhances timeline readability and correlates logical phases with low-level execution.
-  
+
 - Confirm that memory transfers (e.g. `cudaMemcpyAsync`) and kernel executions on different streams **overlap as expected**.
-  
+
 - Check for long **idle gaps** between GPU operations — this usually signals a CPU bottleneck or missing prefetching/synchronization error.
 
 
-### 📦 Example Workflow
+###  Example Workflow
 
 1. Launch your application with:
 ```bash
 nsys profile --trace=cuda,nvtx,osrt ./my_app
 ```
 
-## 3. 📋 Nsight Compute – Kernel Performance
+## 3.  Nsight Compute – Kernel Performance
 
 `Nsight Compute` is NVIDIA's low-level, per-kernel profiler. It provides **fine-grained performance metrics** that reveal how your CUDA kernel behaves at the microarchitectural level.
 
 You can analyze memory throughput, warp execution efficiency, cache utilization, instruction mix, and more — all specific to a single kernel launch.
 
 
-### 🎯 Why Use Nsight Compute?
+###  Why Use Nsight Compute?
 
 - Drill down into individual kernels that appear slow in Nsight Systems.
 - Identify causes of low throughput: memory issues, control flow divergence, register pressure.
 - Validate optimization strategies by comparing metrics pre/post changes.
 
 
-### 📊 Key Metrics and What They Reveal
+###  Key Metrics and What They Reveal
 
 | Metric                        | Insight                                                                 |
 |-------------------------------|-------------------------------------------------------------------------|
-| **SM Efficiency**             | The percentage of time at least one warp was active on the SM. <br>🟢 **High values (80–100%)** indicate good GPU utilization.<br>🔴 **Low values** suggest idle SMs due to under-filled warps or excessive waiting. |
-| **Occupancy**                 | Ratio of active warps to the max possible on an SM.<br>🟢 Helps hide memory latency.<br>🔴 Low occupancy may point to too many registers or shared memory usage. |
-| **Warp Execution Efficiency** | Percentage of threads in a warp that are active.<br>🟢 Close to 100% = uniform execution.<br>🔴 Lower values indicate warp divergence (e.g., `if/else`, loop branching). |
-| **Global Load Efficiency**    | Measures how well memory loads are coalesced and aligned.<br>🟢 High efficiency means consecutive threads access consecutive memory locations.<br>🔴 Poor efficiency leads to increased memory transactions and latency. |
-| **L2 Cache Hit Rate**         | Indicates whether memory accesses benefit from caching.<br>🟢 High hit rate = good data reuse.<br>🔴 Low hit rate = working set is too large or poorly localized. |
+| **SM Efficiency**             | The percentage of time at least one warp was active on the SM. <br> **High values (80–100%)** indicate good GPU utilization.<br> **Low values** suggest idle SMs due to under-filled warps or excessive waiting. |
+| **Occupancy**                 | Ratio of active warps to the max possible on an SM.<br> Helps hide memory latency.<br> Low occupancy may point to too many registers or shared memory usage. |
+| **Warp Execution Efficiency** | Percentage of threads in a warp that are active.<br> Close to 100% = uniform execution.<br> Lower values indicate warp divergence (e.g., `if/else`, loop branching). |
+| **Global Load Efficiency**    | Measures how well memory loads are coalesced and aligned.<br> High efficiency means consecutive threads access consecutive memory locations.<br> Poor efficiency leads to increased memory transactions and latency. |
+| **L2 Cache Hit Rate**         | Indicates whether memory accesses benefit from caching.<br> High hit rate = good data reuse.<br> Low hit rate = working set is too large or poorly localized. |
 
 
-### 🧠 Additional Useful Metrics
+###  Additional Useful Metrics
 
 | Metric                  | Description                                                                 |
 |-------------------------|-----------------------------------------------------------------------------|
@@ -104,14 +104,14 @@ You can analyze memory throughput, warp execution efficiency, cache utilization,
 | **Branch Efficiency**     | Fraction of non-divergent branches in warp execution.                     |
 | **Stall Reasons**         | Categorizes time lost to memory dependency, execution dependency, etc.    |
 
-### 🛠 How to Use Nsight Compute
+###  How to Use Nsight Compute
 
 1. Launch profiling:
 ```bash
 ncu --set full --target-processes all ./my_app
 ```
 
-## 4. 🧠 Roofline Model
+## 4.  Roofline Model
 
 The **Roofline Model** is a visual and conceptual tool that helps you understand the performance limits of your CUDA kernel based on **compute throughput vs. memory bandwidth**.
 
@@ -120,7 +120,7 @@ It shows whether your kernel is:
 - **Compute-bound**: Limited by how fast arithmetic instructions can be executed by the SMs.
 
 
-### 🧮 Key Concepts
+###  Key Concepts
 
 | Concept               | Description                                                                 |
 |------------------------|-----------------------------------------------------------------------------|
@@ -131,7 +131,7 @@ It shows whether your kernel is:
 
 The intersection of your kernel’s **OI** and the roofline curve tells you what your performance ceiling is — and whether you’re bandwidth- or compute-limited.
 
-### 📈 Visualization
+###  Visualization
 
           Compute-bound region
               /
@@ -153,30 +153,30 @@ The intersection of your kernel’s **OI** and the roofline curve tells you what
 - Kernels **below the roofline** are under-optimized.
 - Move **up/right** by increasing data reuse or parallelism.
 
-### 🔧 Optimization Paths
+###  Optimization Paths
 
-#### 🚧 Memory-Bound Kernels
+####  Memory-Bound Kernels
 
 These are limited by bandwidth — they spend more time waiting on memory than doing useful computation.
 
-✅ Strategies:
+ Strategies:
 - **Improve memory coalescing**: Align memory access patterns across warps.
 - **Use shared memory**: Temporarily cache data to reduce global memory loads.
 - **Minimize transfers**: Avoid redundant memory reads/writes.
 - **Prefetch memory**: Use `cudaMemPrefetchAsync()` for Unified Memory.
 
-#### 🚀 Compute-Bound Kernels
+####  Compute-Bound Kernels
 
 These are limited by ALU throughput — they max out the FP units before exhausting memory.
 
-✅ Strategies:
+ Strategies:
 - **Increase ILP**: Schedule multiple independent instructions to reduce stalls.
 - **Reduce warp divergence**: Ensure uniform control flow across threads.
 - **Loop unrolling**: Reduces instruction dispatch overhead and enables more aggressive compiler optimizations.
 - **Use fast math**: `__fmul_rn`, `__fmaf_rn`, or even FP16/Tensor Cores when precision allows.
 
 
-### 🔍 How to Use in Practice
+###  How to Use in Practice
 
 1. Use `Nsight Compute` to calculate:
    - FLOPs executed
@@ -186,7 +186,7 @@ These are limited by ALU throughput — they max out the FP units before exhaust
 3. Decide whether to optimize for memory or compute.
 
 
-### 🧠 Why It Matters
+###  Why It Matters
 
 The Roofline Model helps you:
 - Avoid over-optimizing in the wrong dimension (e.g., tuning FP math when memory is the bottleneck)
@@ -198,7 +198,7 @@ The Roofline Model gives CUDA developers **a clear, visual way to reason about p
 
 
 
-## 5. 🧪 Typical Optimization Strategies
+## 5.  Typical Optimization Strategies
 
 Optimizing CUDA kernels involves tuning memory access patterns, thread efficiency, and instruction utilization. Below are common areas and techniques, along with rationale for each.
 
@@ -211,7 +211,7 @@ Optimizing CUDA kernels involves tuning memory access patterns, thread efficienc
 | **Instruction Mix**| - **Use FP16 and Tensor Cores**: On GPUs with Tensor Core support (Volta and newer), use FP16/TF32 for deep learning or matrix-heavy workloads. <br> - **ILP (Instruction-Level Parallelism)**: Write kernels that have multiple independent instructions per thread to hide latency. <br> - **Fast Math Intrinsics**: Consider `__fmul_rn()` or `__fmaf_rn()` where precision allows to accelerate computation. |
 
 
-### 🛠 Example: Optimizing a Matrix Multiplication Kernel
+###  Example: Optimizing a Matrix Multiplication Kernel
 
 1. **Baseline**: Naive kernel loads all values from global memory.
 2. **Step 1**: Use tiling and load sub-blocks into shared memory.
@@ -222,19 +222,19 @@ Optimizing CUDA kernels involves tuning memory access patterns, thread efficienc
 Result: ~5–10x performance improvement compared to the naive version.
 
 
-### 🔍 Final Tip
+###  Final Tip
 
 Always **measure before and after** applying changes using Nsight Compute or nvprof. Optimization should be data-driven, not guesswork.
 
 
-## 6. 🔍 Occupancy Analysis
+## 6.  Occupancy Analysis
 
 **Occupancy** refers to the ratio of **active warps per Streaming Multiprocessor (SM)** to the **maximum possible warps** on that architecture. It provides a rough measure of how effectively the GPU hardware is being utilized.
 
 High occupancy generally improves performance by allowing the GPU to **hide memory latency** and maintain throughput — but **higher is not always better**.
 
 
-### 🧮 API Usage
+###  API Usage
 
 To estimate optimal configuration:
 
@@ -252,7 +252,7 @@ int maxActiveBlocks;
 cudaOccupancyMaxActiveBlocksPerMultiprocessor(&maxActiveBlocks, myKernel, threadsPerBlock, sharedMemPerBlock);
 ```
 
-📐 Factors That Influence Occupancy
+ Factors That Influence Occupancy
 | Factor	| Description |
 |-------------------------|---------------------------------------------|
 | Threads per Block	| Larger blocks allow more warps but may exceed register or shared memory limits |
@@ -260,13 +260,13 @@ cudaOccupancyMaxActiveBlocksPerMultiprocessor(&maxActiveBlocks, myKernel, thread
 | Shared Memory per Block	| Using too much shared memory reduces block concurrency |
 | Warp Scheduling Limits	| SMs have hardware limits (e.g., 64 warps, 2048 threads, 16 blocks) |
 
-⚠️ Common Pitfall
+ Common Pitfall
 Too high occupancy may:
 - Cause register spilling (to local/global memory)
 - Increase contention for shared memory or caches
 - Limit instruction-level parallelism (ILP)
 
-🧠 Best Practices
+ Best Practices
 - Aim for balanced occupancy (50–80%) unless your kernel is extremely latency-bound.
 - Use --ptxas-options=-v with nvcc to inspect register and shared memory usage:
 
@@ -276,7 +276,7 @@ nvcc -arch=sm_80 --ptxas-options=-v mykernel.cu
     - Look at Achieved Occupancy
     - Compare performance across different launch configurations
 
-📊 Real-World Example
+ Real-World Example
 Matrix multiplication kernel:
 - Initial config: 512 threads/block → High register usage → Only 2 blocks per SM.
 - Tuning: Reduced threads to 256/block, reduced register pressure via compiler flags.
@@ -284,13 +284,13 @@ Matrix multiplication kernel:
 
 Occupancy is not the only factor that determines kernel performance, but it is a powerful lever to tune concurrency and throughput on the GPU.
 
-## 7. 📦 Kernel Launch Config Tuning
+## 7.  Kernel Launch Config Tuning
 
 The configuration of your kernel launch — specifically the **grid** and **block** dimensions — has a significant impact on performance. CUDA does not auto-optimize launch parameters, so manual tuning is critical for peak efficiency.
 
 ---
 
-### 🔧 Key Parameters
+###  Key Parameters
 
 ```cpp
 kernel<<<numBlocks, threadsPerBlock>>>(...);
@@ -303,23 +303,23 @@ Choosing these wisely ensures full GPU utilization, optimal occupancy, and effic
 
 ---
 
-### 🧪 What to Experiment With
+###  What to Experiment With
 
-#### ✅ Varying Block Sizes
+####  Varying Block Sizes
 
 Try powers of two:
 - 128 threads/block
 - 256 threads/block (common sweet spot)
 - 512 threads/block
 
-📌 **Why it matters**:
+ **Why it matters**:
 - Impacts **occupancy** (how many warps/blocks can fit on an SM)
 - Affects **coalescing patterns** in global memory
 - Influences **register/shared memory pressure**
 
 ---
 
-#### 🔁 Tiling and Blocking
+####  Tiling and Blocking
 
 Use **tiling** in shared memory to divide data into reusable blocks.
 
@@ -337,14 +337,14 @@ for (int k = 0; k < N/TILE_SIZE; ++k) {
 }
 ```
 
-📌 **Why it matters**:
+ **Why it matters**:
 - Greatly improves **data locality**
 - Reduces **global memory traffic**
 - Enhances **shared memory reuse**
 
 ---
 
-#### 🔄 Loop Unrolling
+####  Loop Unrolling
 
 Manually unroll inner loops when loop trip count is fixed and small.
 
@@ -355,14 +355,14 @@ for (int i = 0; i < 4; i++) {
 }
 ```
 
-📌 **Why it matters**:
+ **Why it matters**:
 - Reduces loop control overhead
 - Increases **Instruction-Level Parallelism (ILP)**
 - Gives compiler more opportunity to optimize
 
 ---
 
-### 🧠 Best Practices
+###  Best Practices
 
 - Use **`cudaOccupancyMaxPotentialBlockSize()`** to get a good starting point.
 - Start with 256 or 512 threads per block and tune from there.
@@ -371,7 +371,7 @@ for (int i = 0; i < 4; i++) {
 
 ---
 
-### 📊 Example: Matrix Multiplication
+###  Example: Matrix Multiplication
 
 | Config                    | SM Efficiency | Occupancy | Speedup |
 |---------------------------|---------------|-----------|---------|
@@ -384,13 +384,13 @@ for (int i = 0; i < 4; i++) {
 Proper kernel launch tuning can turn a correct kernel into a **high-performance** one. It’s the bridge between working code and GPU-optimized code.
 
 
-## 8. 🚨 Detecting Bottlenecks
+## 8.  Detecting Bottlenecks
 
 Efficient CUDA performance requires identifying and addressing the **right bottleneck**. Profiling tools like **Nsight Compute** and **Nsight Systems** help correlate low-level metrics with performance issues.
 
 ---
 
-### 🔍 Common Bottlenecks and Their Root Causes
+###  Common Bottlenecks and Their Root Causes
 
 | Symptom                 | Likely Cause                                                        |
 |-------------------------|---------------------------------------------------------------------|
@@ -401,7 +401,7 @@ Efficient CUDA performance requires identifying and addressing the **right bottl
 
 ---
 
-### 🧠 How to Detect
+###  How to Detect
 
 - Use **Nsight Compute** to monitor:
   - SM utilization
@@ -414,14 +414,14 @@ Efficient CUDA performance requires identifying and addressing the **right bottl
 ncu --metrics sm__throughput.avg.pct_of_peak_sustained_elapsed,dram__throughput.avg.pct_of_peak_sustained_elapsed ./my_kernel
 ```
 
-### ✅ Actionable Tips
+###  Actionable Tips
 - Low Occupancy → Reduce register/shared mem usage or increase threads/block
 - Memory Bottlenecks → Improve coalescing, leverage shared memory
 - Warp Inefficiency → Restructure control flow to minimize divergence
 - Cache Misses → Refactor for reuse or reduce working set size
 
 
-## 🧠 Director-Level Insights
+##  Director-Level Insights
 
 | Topic                        | Talking Point                                                                 |
 |-----------------------------|-------------------------------------------------------------------------------|

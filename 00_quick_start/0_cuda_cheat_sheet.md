@@ -1,7 +1,7 @@
 # CUDA Technical Mastery – Cheat Sheet
 
 
-## 1. 🏗️ GPU Architecture
+## 1.  GPU Architecture
 
 | Concept | Description | Key Notes |
 |---------|-------------|-----------|
@@ -12,17 +12,17 @@
 | **Memory Controllers** | Manage access to global memory | Determine memory bandwidth |
 | **Tensor Cores** | Specialized units for AI workloads | Mixed-precision matrix operations |
 
-📌 **Best Practice**: Choose GPU based on workload requirements (compute vs memory intensive).
+ **Best Practice**: Choose GPU based on workload requirements (compute vs memory intensive).
 
-### 🏗️ **Hardware Hierarchy**
+###  **Hardware Hierarchy**
 ```
          GPU Device
               |
-    ┌─────────┼─────────┐
-   SM-0     SM-1    ... SM-N
+
+   SM-0 SM-1    ... SM-N
     |         |           |
-┌───┼───┐ ┌───┼───┐   ┌───┼───┐
-C-0...C-N C-0...C-N   C-0...C-N
+
+C-0...C-N C-0...C-N C-0...C-N
 (CUDA Cores per SM)
 ```
 
@@ -42,7 +42,7 @@ C-0...C-N C-0...C-N   C-0...C-N
 
 
 
-## 2. 🚦 Execution Model
+## 2.  Execution Model
 
 | Concept           | Description                                           | Key Notes                                             |
 |------------------|-------------------------------------------------------|--------------------------------------------------------|
@@ -52,7 +52,7 @@ C-0...C-N C-0...C-N   C-0...C-N
 | **Grid**          | Collection of blocks distributed across SMs          | Can be 1D, 2D, 3D                                     |
 | **Indexing**      | `threadIdx`, `blockIdx`, `blockDim`, `gridDim`       | Used to access per-thread data                        |
 
-📌 **Best Practice**: Align your kernel design to problem geometry (e.g. 2D grid for images).
+ **Best Practice**: Align your kernel design to problem geometry (e.g. 2D grid for images).
 
 ![Grid of Thread Blocks](../images/grid-of-thread-blocks.png)
 
@@ -68,7 +68,7 @@ C-0...C-N C-0...C-N   C-0...C-N
 - All threads in a **warp** execute the same instruction (SIMT model)
 - **Blocks** within a **grid** can execute in any order (independence requirement)
 
-### 🔧 **Kernel Fundamentals**
+###  **Kernel Fundamentals**
 | Concept | Description | Key Notes |
 |---------|-------------|-----------|
 | **Kernel** | `__global__` function executed by all threads in parallel | Uses `<<<grid, block>>>` launch syntax |
@@ -86,7 +86,7 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 
 
-## 3. 🧠 Memory Hierarchy
+## 3.  Memory Hierarchy
 
 | Type            | Scope     | Speed     | Use Case                                     |
 |-----------------|-----------|-----------|----------------------------------------------|
@@ -97,7 +97,7 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 | **Texture/Surface** | Grid   | Optimized | 2D spatial locality, read-only                |
 | **Unified Mem**  | Grid/Host | Medium    | Simplified allocation, slower for frequent access |
 
-📌 **Best Practice**:
+ **Best Practice**:
 - Coalesce global memory access
 - Use shared memory to reduce global loads
 - Avoid shared memory **bank conflicts**
@@ -121,7 +121,7 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 
 
-## 4. ⚙️ Streams & Concurrency
+## 4.  Streams & Concurrency
 
 | Concept              | Description                                              |
 |----------------------|----------------------------------------------------------|
@@ -131,13 +131,13 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 | **Stream priorities** | Control execution ordering                               |
 | **CUDA Graphs**       | Capture & replay workflows with less overhead            |
 
-📌 **Best Practice**:
+ **Best Practice**:
 - Use pinned host memory (`cudaHostAlloc`) for async memcpy
 - Use `cudaMemcpyAsync()` and multiple streams for throughput
 
 ---
 
-## 5. 📈 Profiling & Optimization
+## 5.  Profiling & Optimization
 
 | Tool               | Use Case                             |
 |--------------------|--------------------------------------|
@@ -146,19 +146,19 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 | **Nsight Systems** | Full system profiling (timeline)     |
 | `cuda-gdb`         | Debugger for CUDA code               |
 
-### 🔍 Optimization Metrics
+###  Optimization Metrics
 - **Occupancy**: Threads/SM efficiency
 - **Memory Throughput**: Avoid serialization
 - **Warp Efficiency**: Avoid divergence
 - **Execution Dependencies**: Hide latency with async
 
-📌 **Best Practice**:
+ **Best Practice**:
 - Balance compute vs memory (Roofline model)
 - Use shared memory tiling for matrix ops
 
 ---
 
-## 6. 🧬 Advanced Features
+## 6.  Advanced Features
 
 | Feature              | Description                                      |
 |----------------------|--------------------------------------------------|
@@ -167,13 +167,13 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 | **Tensor Cores**      | Fused matrix-multiply for DL (use `mma.sync`)   |
 | **cuBLAS/cuDNN/cuFFT**| Optimized CUDA libraries                        |
 
-📌 **Best Practice**:
+ **Best Practice**:
 - Use libraries when possible over hand-coded kernels
 - Use `cudaFuncAttributes` to tune resource use
 
 ---
 
-## 7. 🌐 Multi-GPU & Unified Memory
+## 7.  Multi-GPU & Unified Memory
 
 | Concept               | Details                                            |
 |------------------------|----------------------------------------------------|
@@ -182,13 +182,13 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 | **Unified Memory**     | `cudaMallocManaged` for simplified pointer mgmt    |
 | **Prefetching**        | Use `cudaMemPrefetchAsync()` for hinting data loc  |
 
-📌 **Best Practice**:
+ **Best Practice**:
 - Avoid relying solely on Unified Memory for perf-sensitive workloads
 - Enable ECC for mission-critical enterprise workloads
 
 ---
 
-## ✅ Key Code Snippets
+##  Key Code Snippets
 
 ```cpp
 // Thread Indexing (2D Grid)
@@ -206,7 +206,7 @@ cudaMemcpyAsync(dst, src, size, cudaMemcpyHostToDevice, stream);
 
 ---
 
-## 🎯 Director-Level Talking Points
+##  Director-Level Talking Points
 
 | Topic                          | Insight Example                                                                 |
 |-------------------------------|----------------------------------------------------------------------------------|

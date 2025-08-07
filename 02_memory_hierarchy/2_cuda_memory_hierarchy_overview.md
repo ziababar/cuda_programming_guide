@@ -1,55 +1,55 @@
-# 🧠 CUDA Memory Hierarchy - Overview & Quick Reference
+#  CUDA Memory Hierarchy - Overview & Quick Reference
 
 Understanding the CUDA memory hierarchy is **critical** for writing performant kernels. The choice of memory and access pattern dramatically impacts latency, bandwidth utilization, and overall throughput.
 
-## 📚 Navigation Guide
+##  Navigation Guide
 
-### 🔗 **Detailed Section Files**
-- **[📋 Memory Types Deep Dive](2a_memory_types_detailed.md)** - Complete explanations of all memory types
-- **[🌐 Global Memory Optimization](2b_global_memory_advanced.md)** - Coalescing patterns and performance analysis  
-- **[⚡ Shared Memory Complete Guide](2c_shared_memory_complete.md)** - Matrix multiplication, bank conflicts, benchmarks
-- **[📥 Constant Memory Complete Guide](2d_constant_memory_complete.md)** - Domain examples, optimization strategies
-- **[🔁 Unified Memory Complete Guide](2e_unified_memory_complete.md)** - Advanced techniques, multi-GPU, performance analysis
-- **[🛠 Memory Debugging Toolkit](2f_memory_debugging_complete.md)** - Troubleshooting workflows and profiling strategies
+###  **Detailed Section Files**
+- **[ Memory Types Deep Dive](2a_memory_types_detailed.md)** - Complete explanations of all memory types
+- **[ Global Memory Optimization](2b_global_memory_advanced.md)** - Coalescing patterns and performance analysis
+- **[ Shared Memory Complete Guide](2c_shared_memory_complete.md)** - Matrix multiplication, bank conflicts, benchmarks
+- **[ Constant Memory Complete Guide](2d_constant_memory_complete.md)** - Domain examples, optimization strategies
+- **[ Unified Memory Complete Guide](2e_unified_memory_complete.md)** - Advanced techniques, multi-GPU, performance analysis
+- **[ Memory Debugging Toolkit](2f_memory_debugging_complete.md)** - Troubleshooting workflows and profiling strategies
 
 ---
 
-## 🧠 **Memory Types Complete Reference**
+##  **Memory Types Complete Reference**
 
 | Memory Type | Latency | Size Limit | Scope | Lifetime | Access Pattern | Best For | Detailed Guide |
 |-------------|---------|------------|-------|----------|----------------|----------|----------------|
-| **Registers** | ~1 cycle | 32-255/thread | Thread | Kernel | Private to thread | Scalars, loop counters, temporary values | [📋 Types Guide](2a_memory_types_detailed.md#registers) |
-| **Local Memory** | 300-600 cycles | Unlimited | Thread | Kernel | Private (in global mem) | Arrays/structs too large for registers | [📋 Types Guide](2a_memory_types_detailed.md#local-memory) |
-| **Shared Memory** | ~2-3 cycles | 48-164 KB/block | Block | Kernel | Shared within block | Tile storage, cooperative block computation | [⚡ Shared Guide](2c_shared_memory_complete.md) |
-| **Global Memory** | 300-600 cycles | GPU VRAM | All Threads | Application | Read/Write by all | Main memory for large input/output datasets | [🌐 Global Guide](2b_global_memory_advanced.md) |
-| **Constant Memory** | ~1 cycle (cached) | 64 KB total | All Threads | Application | Broadcast to all (RO) | Lookup tables, config params, small readonly data | [📥 Constant Guide](2d_constant_memory_advanced.md) |
-| **Texture/Surface** | ~1-10 cycles (cached) | GPU VRAM | All Threads | Application | Specialized read/write | 2D/3D spatial data, image processing | [📋 Types Guide](2a_memory_types_detailed.md#texture-memory) |
-| **Unified Memory** | Variable | System RAM+GPU | CPU + GPU | Application | Auto-migrated host/device | Rapid development, shared CPU-GPU access | [🔁 Unified Guide](2e_unified_memory_advanced.md) |
+| **Registers** | ~1 cycle | 32-255/thread | Thread | Kernel | Private to thread | Scalars, loop counters, temporary values | [ Types Guide](2a_memory_types_detailed.md#registers) |
+| **Local Memory** | 300-600 cycles | Unlimited | Thread | Kernel | Private (in global mem) | Arrays/structs too large for registers | [ Types Guide](2a_memory_types_detailed.md#local-memory) |
+| **Shared Memory** | ~2-3 cycles | 48-164 KB/block | Block | Kernel | Shared within block | Tile storage, cooperative block computation | [ Shared Guide](2c_shared_memory_complete.md) |
+| **Global Memory** | 300-600 cycles | GPU VRAM | All Threads | Application | Read/Write by all | Main memory for large input/output datasets | [ Global Guide](2b_global_memory_advanced.md) |
+| **Constant Memory** | ~1 cycle (cached) | 64 KB total | All Threads | Application | Broadcast to all (RO) | Lookup tables, config params, small readonly data | [ Constant Guide](2d_constant_memory_advanced.md) |
+| **Texture/Surface** | ~1-10 cycles (cached) | GPU VRAM | All Threads | Application | Specialized read/write | 2D/3D spatial data, image processing | [ Types Guide](2a_memory_types_detailed.md#texture-memory) |
+| **Unified Memory** | Variable | System RAM+GPU | CPU + GPU | Application | Auto-migrated host/device | Rapid development, shared CPU-GPU access | [ Unified Guide](2e_unified_memory_advanced.md) |
 
 
-#### 🔸 Registers
+####  Registers
 Registers provide the most efficient, low-latency storage available to CUDA threads. They are allocated per thread and are ideal for **frequently reused** values such as loop counters, temporary calculations, and scalar variables. However, registers are limited in number per thread, and excess usage causes register spills into **local memory**, which significantly degrades performance.
 
-#### 🔸 Local Memory
+####  Local Memory
 Despite its name, local memory actually resides in **global memory** and has similar high latency characteristics. This memory type is used for large thread-local arrays and register spills when the number of registers exceeds the hardware limit. Accesses to local memory are slower and uncached unless explicitly optimized, making it important to minimize its usage.
 
-#### 🔸 Shared Memory
+####  Shared Memory
 Shared memory resides **on-chip** and provides very low latency access. It is visible and writable to all threads within a block, making it perfect for tiling algorithms (such as matrix multiplication) and inter-thread communication within a block. To achieve optimal performance, developers must carefully manage **bank conflicts** that can serialize memory accesses.
 
-#### 🔸 Global Memory
+####  Global Memory
 Global memory serves as the primary GPU memory (DRAM) and has high latency of approximately 300–600 cycles. It is accessible by all threads and can be accessed by the CPU through explicit memory copies or unified memory. The key optimization for global memory is ensuring **coalesced access** patterns to reduce transaction overhead and maximize memory bandwidth utilization.
 
-#### 🔸 Constant Memory
+####  Constant Memory
 Constant memory is read-only memory that is cached and broadcast-efficient across all threads. It is size-limited (typically 64 KB) and is ideal for storing uniform values such as configuration parameters, coefficients, and lookup tables. This memory type is accessed via the `__constant__` qualifier and provides excellent performance when the same data is read by multiple threads.
 
-#### 🔸 Texture/Surface Memory
+####  Texture/Surface Memory
 Texture and surface memory are specialized for 2D/3D spatial access patterns and are commonly used in image and signal processing applications. They offer built-in **caching**, **addressing**, and **interpolation** features that can significantly improve performance for spatially coherent data access patterns.
 
-#### 🔸 Unified Memory
+####  Unified Memory
 Unified memory abstracts away explicit `cudaMemcpy` operations by providing system-managed page migration between CPU and GPU. While this makes programming easier, performance can suffer from page faults and unpredictable behavior if memory is not properly prefetched using techniques like `cudaMemPrefetchAsync()`.
 
 
-### 🔎 Why It Matters
+###  Why It Matters
 
 The choice of memory directly influences performance and developer productivity.
 
@@ -68,25 +68,25 @@ Understanding these trade-offs enables you to:
 - Design scalable, high-performance kernels.
 
 
-### 🧠 Director-Level Insight
+###  Director-Level Insight
 
 > “We re-architected a batched inference kernel to shift from global to shared memory for intermediate tensors, resulting in a 4.2x speedup on A100. We also used constant memory for weights shared across warps to improve L1 utilization.”
 
 
-## ⚡ **Performance Quick Reference**
+##  **Performance Quick Reference**
 
-### 🎯 **Memory Bandwidth Efficiency**
+###  **Memory Bandwidth Efficiency**
 ```
 Theoretical Peak: ~1000 GB/s (RTX 4090)
 
 Achieved Performance by Optimization:
-├── Naive Global Access:     124 GB/s (12% efficiency)
-├── Coalesced Access:        201 GB/s (20% efficiency)  
-├── Shared Memory Tiled:     487 GB/s (48% efficiency)
-└── Optimized + No Conflicts: 603 GB/s (60% efficiency)
+ Naive Global Access:     124 GB/s (12% efficiency)
+ Coalesced Access:        201 GB/s (20% efficiency)
+ Shared Memory Tiled:     487 GB/s (48% efficiency)
+ Optimized + No Conflicts: 603 GB/s (60% efficiency)
 ```
 
-### 🚀 **Common Optimization Impact**
+###  **Common Optimization Impact**
 | Optimization | Typical Speedup | When to Use |
 |--------------|----------------|-------------|
 | **Coalesced Access** | 1.5-3x | Always for global memory |
@@ -95,37 +95,37 @@ Achieved Performance by Optimization:
 | **Constant Memory** | 2-50x | Small uniform read-only data |
 | **Unified Memory + Prefetch** | 1.5-4x | CPU-GPU workflows |
 
-## 🔧 **Essential Code Patterns**
+##  **Essential Code Patterns**
 
-### ✅ **Coalesced Global Memory Access**
+###  **Coalesced Global Memory Access**
 ```cpp
 // Good: Consecutive threads → consecutive addresses
 int idx = threadIdx.x + blockIdx.x * blockDim.x;
 float val = data[idx];  // Perfect coalescing
 ```
 
-### ⚡ **Shared Memory Template**
+###  **Shared Memory Template**
 ```cpp
 __global__ void optimized_kernel(float* input, float* output) {
     __shared__ float tile[TILE_SIZE][TILE_SIZE + 1]; // +1 prevents bank conflicts
-    
+
     // Load phase
     tile[threadIdx.y][threadIdx.x] = input[...]; // Coalesced load
     __syncthreads();
-    
-    // Compute phase  
+
+    // Compute phase
     float result = 0;
     for (int i = 0; i < TILE_SIZE; i++) {
         result += tile[threadIdx.y][i] * tile[i][threadIdx.x]; // Fast shared access
     }
     __syncthreads();
-    
+
     // Store phase
     output[...] = result; // Coalesced store
 }
 ```
 
-### 📥 **Constant Memory Pattern**
+###  **Constant Memory Pattern**
 ```cpp
 __constant__ float lookup_table[1024];
 
@@ -138,7 +138,7 @@ __device__ float fast_lookup(int index) {
 }
 ```
 
-### 🔁 **Unified Memory Pattern**
+###  **Unified Memory Pattern**
 ```cpp
 // Allocation
 float* data;
@@ -153,20 +153,20 @@ kernel<<<blocks, threads>>>(data);
 process_results_cpu(data);
 ```
 
-## 🚨 **Common Performance Issues & Quick Fixes**
+##  **Common Performance Issues & Quick Fixes**
 
-### ❌ **Issue: Poor Global Memory Performance**
+###  **Issue: Poor Global Memory Performance**
 **Symptom:** `gld_efficiency < 50%` in profiler
 **Quick Fix:** Ensure consecutive threads access consecutive memory
 ```cpp
 // Bad: Strided access
 data[threadIdx.x * stride]
 
-// Good: Sequential access  
+// Good: Sequential access
 data[threadIdx.x + blockIdx.x * blockDim.x]
 ```
 
-### ❌ **Issue: Shared Memory Bank Conflicts**
+###  **Issue: Shared Memory Bank Conflicts**
 **Symptom:** `shared_load_transactions_per_request > 1.0`
 **Quick Fix:** Add padding to shared arrays
 ```cpp
@@ -177,7 +177,7 @@ __shared__ float tile[32][32];
 __shared__ float tile[32][33]; // +1 element padding
 ```
 
-### ❌ **Issue: Unified Memory Page Faults**
+###  **Issue: Unified Memory Page Faults**
 **Symptom:** Irregular first-run performance
 **Quick Fix:** Prefetch before kernel launch
 ```cpp
@@ -185,66 +185,66 @@ cudaMemPrefetchAsync(data, size, 0); // Move to GPU
 kernel<<<blocks, threads>>>(data);
 ```
 
-## 📊 **Profiling Quick Commands**
+##  **Profiling Quick Commands**
 
-### 🔍 **Memory Coalescing Check**
+###  **Memory Coalescing Check**
 ```bash
 ncu --metrics gld_efficiency,gst_efficiency ./app
 # Target: > 80%
 ```
 
-### 🔍 **Shared Memory Conflicts**
+###  **Shared Memory Conflicts**
 ```bash
-ncu --metrics shared_load_transactions_per_request ./app  
+ncu --metrics shared_load_transactions_per_request ./app
 # Target: < 1.1
 ```
 
-### 🔍 **Overall Memory Performance**
+###  **Overall Memory Performance**
 ```bash
 ncu --metrics dram__throughput.avg.pct_of_peak_sustained_elapsed ./app
 # Target: > 60% for memory-bound kernels
 ```
 
-### 🔍 **Unified Memory Analysis**
+###  **Unified Memory Analysis**
 ```bash
 nsys profile --trace=cuda ./app
 # Look for: Page fault patterns in timeline view
 ```
 
-## 🎯 **Optimization Decision Tree**
+##  **Optimization Decision Tree**
 
 ```
 Memory Performance Issue?
-├── Low global memory efficiency?
-│   ├── Fix coalescing → [🌐 Global Guide](2b_global_memory_advanced.md)
-│   └── Use shared memory tiling → [⚡ Shared Guide](2c_shared_memory_complete.md)
-├── Shared memory bank conflicts?
-│   └── Add padding, fix access patterns → [⚡ Shared Guide](2c_shared_memory_complete.md#bank-conflicts)
-├── Small uniform read-only data?
-│   └── Use constant memory → [📥 Constant Guide](2d_constant_memory_advanced.md)  
-├── Complex CPU-GPU workflows?
-│   └── Optimize unified memory → [🔁 Unified Guide](2e_unified_memory_advanced.md)
-└── Still having issues?
-    └── Systematic debugging → [🛠 Debug Guide](2f_memory_debugging_complete.md)
+ Low global memory efficiency?
+    Fix coalescing → [ Global Guide](2b_global_memory_advanced.md)
+    Use shared memory tiling → [ Shared Guide](2c_shared_memory_complete.md)
+ Shared memory bank conflicts?
+    Add padding, fix access patterns → [ Shared Guide](2c_shared_memory_complete.md#bank-conflicts)
+ Small uniform read-only data?
+    Use constant memory → [ Constant Guide](2d_constant_memory_advanced.md)
+ Complex CPU-GPU workflows?
+    Optimize unified memory → [ Unified Guide](2e_unified_memory_advanced.md)
+ Still having issues?
+     Systematic debugging → [ Debug Guide](2f_memory_debugging_complete.md)
 ```
 
-## 🧠 **Key Principles**
+##  **Key Principles**
 
-1. **🎯 Coalesce First**: Always ensure global memory accesses are coalesced
-2. **⚡ Reuse in Shared**: Move frequently reused data to shared memory  
-3. **📥 Broadcast Constants**: Use constant memory for uniform read-only data
-4. **🔧 Profile Everything**: Use Nsight Compute/Systems to validate optimizations
-5. **📚 Understand Trade-offs**: Sometimes lower occupancy = better performance
+1. ** Coalesce First**: Always ensure global memory accesses are coalesced
+2. ** Reuse in Shared**: Move frequently reused data to shared memory
+3. ** Broadcast Constants**: Use constant memory for uniform read-only data
+4. ** Profile Everything**: Use Nsight Compute/Systems to validate optimizations
+5. ** Understand Trade-offs**: Sometimes lower occupancy = better performance
 
-## 💡 **Next Steps**
+##  **Next Steps**
 
-1. **Start with**: [🌐 Global Memory Guide](2b_global_memory_advanced.md) for coalescing basics
-2. **Then learn**: [⚡ Shared Memory Guide](2c_shared_memory_complete.md) for advanced tiling
-3. **Specialize with**: [📥 Constant](2d_constant_memory_advanced.md) or [🔁 Unified](2e_unified_memory_advanced.md) memory guides
-4. **Debug with**: [🛠 Debugging Toolkit](2f_memory_debugging_complete.md) when performance issues arise
+1. **Start with**: [ Global Memory Guide](2b_global_memory_advanced.md) for coalescing basics
+2. **Then learn**: [ Shared Memory Guide](2c_shared_memory_complete.md) for advanced tiling
+3. **Specialize with**: [ Constant](2d_constant_memory_advanced.md) or [ Unified](2e_unified_memory_advanced.md) memory guides
+4. **Debug with**: [ Debugging Toolkit](2f_memory_debugging_complete.md) when performance issues arise
 
 ---
 
-**💡 Pro Tip**: Start simple with coalesced global memory, then progressively add shared memory optimizations. Profile at each step to quantify improvements!
+** Pro Tip**: Start simple with coalesced global memory, then progressively add shared memory optimizations. Profile at each step to quantify improvements!
 
 
