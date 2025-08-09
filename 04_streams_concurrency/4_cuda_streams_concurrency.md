@@ -5231,13 +5231,3 @@ void demonstrate_comprehensive_advanced_patterns() {
   - Shared resources
   - Host sync calls (`cudaDeviceSynchronize()`)
 
----
-
-##  Director-Level Insights
-
-| Topic                        | Talking Point                                                                    |
-|-----------------------------|-----------------------------------------------------------------------------------|
-| Pipeline optimization        | “We restructured the training pipeline using streams and async memory ops to reduce idle time by 35%.” |
-| Memory throughput tuning     | “Pinned memory + multi-stream overlap helped saturate PCIe bandwidth.”           |
-| Low-latency inference        | “Used CUDA Graphs to minimize overhead in microsecond-scale inference loops.”    |
-| Team enablement              | “Trained team to visualize and debug stream interactions using Nsight Systems.”  |

@@ -203,14 +203,4 @@ __syncthreads();
 // Async Copy
 cudaMemcpyAsync(dst, src, size, cudaMemcpyHostToDevice, stream);
 ```
-
----
-
-##  Director-Level Talking Points
-
-| Topic                          | Insight Example                                                                 |
-|-------------------------------|----------------------------------------------------------------------------------|
-| Strategic CUDA adoption       | “We shifted a genomics pipeline to CUDA, reducing processing time by 80%.”     |
-| Vendor/platform optimization  | “Benchmarked A100 vs L40S to guide GPU fleet investments for mixed workloads.” |
-| GPU-aware system design       | “Used graph capture + multi-stream execution for NLP inference batching.”       |
-| Team enablement               | “Mentored team on using Nsight tools to identify warp inefficiencies.”         |
+  |

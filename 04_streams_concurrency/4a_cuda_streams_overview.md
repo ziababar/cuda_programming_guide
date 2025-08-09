@@ -2,7 +2,7 @@
 
 CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. This comprehensive guide series covers everything from fundamentals to advanced production patterns.
 
-**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../03_memory_hierarchy/3_cuda_memory_hierarchy.md)** | **Architecture: [Execution Model](../01_execution_model/1_cuda_execution_model.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../03_memory_hierarchy/3_cuda_memory_hierarchy_overview.md)** | **Architecture: [Execution Model](../01_execution_model/1_cuda_execution_model_overview.md)**
 
 ---
 
@@ -17,7 +17,7 @@ CUDA streams are the backbone of high-performance GPU programming, enabling asyn
 *Master the essentials of CUDA streams, async operations, and memory management patterns.*
 
 ###  **Part 2: Advanced Coordination Patterns**
-**[3b_cuda_streams.md](3b_cuda_streams.md)**
+**[3b_cuda_streams_advanced.md](3b_cuda_streams_advanced.md)**
 -  Event-Driven Programming
 -  CUDA Graphs Deep Dive
 -  Advanced Stream Patterns
@@ -83,7 +83,7 @@ cudaGraphLaunch(graph_exec, stream);
 Start with [Part 1: Fundamentals](3a_cuda_streams_fundamentals.md) to learn stream basics and async programming.
 
 ### **Intermediate Path:**
-Jump to [Part 2: Advanced Patterns](3b_cuda_streams.md) if you know stream basics but want sophisticated coordination techniques.
+Jump to [Part 2: Advanced Patterns](3b_cuda_streams_advanced.md) if you know stream basics but want sophisticated coordination techniques.
 
 ### **Expert Path:**
 Go directly to [Part 3: Production Systems](3c_cuda_streams_production.md) for multi-GPU scaling and enterprise deployment patterns.

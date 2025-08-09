@@ -421,11 +421,3 @@ ncu --metrics sm__throughput.avg.pct_of_peak_sustained_elapsed,dram__throughput.
 - Cache Misses → Refactor for reuse or reduce working set size
 
 
-##  Director-Level Insights
-
-| Topic                        | Talking Point                                                                 |
-|-----------------------------|-------------------------------------------------------------------------------|
-| Performance debugging        | “Used Nsight Compute to identify poor L2 reuse in sparse matrix kernels.”   |
-| Iterative tuning             | “We tuned occupancy by adjusting thread block size and shared memory use.”  |
-| Visualizing system behavior  | “Stream timelines in Nsight Systems helped align data transfer + compute.”   |
-| Scaling decisions            | “Profiling showed memory-bound ops, so we scaled vertically with HBM GPUs.” |
