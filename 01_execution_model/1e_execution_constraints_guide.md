@@ -530,11 +530,11 @@ void launch_3d_kernel(float* h_data, int width, int height, int depth) {
 
 ---
 
-## ⏱ **Execution Time Limits**
+## **Execution Time Limits**
 
 GPU kernels face various time constraints that can cause execution failures or poor performance.
 
-### ⏰ **Watchdog Timer Constraints**
+### **Watchdog Timer Constraints**
 
 #### **Handling Watchdog Timeouts:**
 ```cpp
@@ -1365,14 +1365,14 @@ void analyze_kernel_constraints() {
 
 ##  **Key Takeaways**
 
-1. ** Know Your Limits**: Always query device properties and respect hardware constraints
-2. ** Memory Efficiency**: Balance shared memory usage with occupancy requirements
-3. ** Thread Organization**: Use warp-aligned block sizes and avoid unnecessary divergence
-4. **⏱ Time Management**: Break long kernels into chunks to avoid watchdog timeouts
-5. ** Minimize Divergence**: Structure algorithms to reduce warp divergence penalties
-6. ** Plan Workarounds**: Have fallback strategies for resource-constrained scenarios
-7. ** Profile and Optimize**: Use profiling tools to identify and resolve constraint bottlenecks
-8. ** Continuous Monitoring**: Regularly analyze constraint adherence and performance impact
+1. **Know Your Limits**: Always query device properties and respect hardware constraints
+2. **Memory Efficiency**: Balance shared memory usage with occupancy requirements
+3. **Thread Organization**: Use warp-aligned block sizes and avoid unnecessary divergence
+4. **Time Management**: Break long kernels into chunks to avoid watchdog timeouts
+5. **Minimize Divergence**: Structure algorithms to reduce warp divergence penalties
+6. **Plan Workarounds**: Have fallback strategies for resource-constrained scenarios
+7. **Profile and Optimize**: Use profiling tools to identify and resolve constraint bottlenecks
+8. **Continuous Monitoring**: Regularly analyze constraint adherence and performance impact
 
 ##  **Related Guides**
 
