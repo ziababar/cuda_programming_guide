@@ -1,10 +1,6 @@
 # CUDA Programming Guide
 
-A comprehensive, hands-on guide to CUDA programming covering everyth### **Navigation Tips**
-- Main files provide comprehensive coverage of each topic
-- Subfiles (ending with letters like `a`, `b`, `c`) cover specific aspects in detail
-- Cross-references between files help you find related concepts
-- Code examples are optimized and ready to runrom basic concepts to advanced optimization techniques. This guide is structured as a practical reference for developers at all levels.
+A comprehensive, hands-on guide to CUDA programming covering everything from basic concepts to advanced optimization techniques. This guide is structured as a practical reference for developers at all levels.
 
 ## Table of Contents
 
@@ -27,7 +23,7 @@ A comprehensive, hands-on guide to CUDA programming covering everyth### **Naviga
 - **[Memory Debugging](02_memory_hierarchy/2f_memory_debugging.md)** - Profiling and troubleshooting
 
 ### Synchronization - [`03_synchronization/`](03_synchronization/)
-- **[Synchronization](32_synchronization/3_synchronization.md)** - Thread coordination and cooperation patterns
+- **[Synchronization](03_synchronization/3_synchronization.md)** - Thread coordination and cooperation patterns
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
 - **[CUDA Streams](04_streams_concurrency/4a_cuda_streams.md)** - Asynchronous execution concepts
@@ -47,9 +43,9 @@ A comprehensive, hands-on guide to CUDA programming covering everyth### **Naviga
 
 ### **Intermediate Path**
 1. Deep dive into [Warp Execution](01_execution_model/1b_warp_execution.md)
-2. Master [Synchronization](03_synchronization/3_synchronization.md)
-3. Understand [Streaming Multiprocessors Deep Dive](01_execution_model/1c_streaming_multiprocessors_deep.md)
-4. Learn [Shared Memory](02_memory_hierarchy/2c_shared_memory.md)
+2. Understand [Streaming Multiprocessors Deep Dive](01_execution_model/1c_streaming_multiprocessors_deep.md)
+3. Learn [Shared Memory](02_memory_hierarchy/2c_shared_memory.md)
+4. Master [Synchronization](03_synchronization/3_synchronization.md)
 5. Apply [CUDA Profiling](05_performance_profiling/5_cuda_profiling.md) techniques
 
 ### **Advanced Path**
