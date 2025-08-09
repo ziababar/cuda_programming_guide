@@ -8,7 +8,7 @@ Understanding the CUDA execution model is **essential** for writing performant G
 - **[ Thread Hierarchy Complete Guide](1a_thread_hierarchy.md)** - Thread/Block/Grid organization, indexing patterns, dimensionality choices
 - **[ Warp Execution Advanced Guide](1b_warp_execution.md)** - SIMT model, divergence optimization, warp intrinsics, debugging
 - **[ Streaming Multiprocessors Deep Dive](1c_streaming_multiprocessors_deep.md)** - SM architecture, scheduling, occupancy tuning, resource management
-- **[Synchronization Complete Guide](../02_synchronization/2_synchronization.md)** - Thread barriers, cooperative groups, race condition prevention
+- **[Synchronization Complete Guide](../03_synchronization/3_synchronization.md)** - Thread barriers, cooperative groups, race condition prevention
 - **[ Execution Constraints Guide](1e_execution_constraints_guide.md)** - Hardware limits, resource tradeoffs, launch configuration validation
 
 ---
@@ -230,7 +230,7 @@ GPU Performance Issue?
  Branch divergence issues?
     Optimize warp execution → [ Warp Guide](1b_warp_execution.md)
  Thread coordination problems?
-    Fix synchronization → [Sync Guide](../02_synchronization/2_synchronization.md)
+    Fix synchronization → [Sync Guide](../03_synchronization/3_synchronization.md)
  Indexing or memory access issues?
     Review thread hierarchy → [ Thread Guide](1a_thread_hierarchy.md)
  Need optimization examples?
