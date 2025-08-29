@@ -2,7 +2,7 @@
 
 Memory issues are among the most challenging problems in CUDA development. This comprehensive guide provides systematic approaches, advanced debugging techniques, and diagnostic workflows for identifying and resolving all types of memory-related issues.
 
-**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Unified Memory Guide](2e_unified_memory.md)** | **Next: [Streams & Concurrency](../04_streams_concurrency/4_cuda_streams_concurrency.md)**
+**[Back to Overview](1_cuda_memory_hierarchy.md)** | **Previous: [Unified Memory Guide](5_unified_memory.md)** | **Next: [Streams & Concurrency](../04_streams_concurrency/1_cuda_streams_concurrency.md)**
 
 ---
 
@@ -1568,10 +1568,9 @@ ProductionMemoryManager g_memory_manager;
 
 ##  **Related Guides**
 
-- **Next Step**: [ Performance Benchmarking Guide&performance_benchmarking.md) - Systematic performance analysis
-- **Previous**: [Unified Memory Complete Guide](2e_unified_memory.md) - Advanced memory management
-- **Tools Reference**: [ Memory Hierarchy Overview&cuda_memory_hierarchy.md) - Quick debugging reference
-- **Optimization**: [ Memory Optimization Patterns&memory_optimization_patterns.md) - Best practices
+- **Next Step**: [Performance Benchmarking Guide](../05_performance_profiling/1_cuda_profiling.md) - Systematic performance analysis
+- **Previous**: [Unified Memory Complete Guide](5_unified_memory.md) - Advanced memory management
+- **Tools Reference**: [Memory Hierarchy Overview](1_cuda_memory_hierarchy.md) - Quick debugging reference
 
 ---
 

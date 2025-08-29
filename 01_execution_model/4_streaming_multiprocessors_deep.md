@@ -2,7 +2,7 @@
 
 Streaming Multiprocessors (SMs) are the heart of GPU architecture. Understanding SM design, resource allocation, and scheduling is essential for optimizing CUDA applications and achieving maximum performance.
 
-**[Back to Overview](1_cuda_execution_model.md)** | **Previous: [Warp Execution Guide](1b_warp_execution.md)** | **Next: [Synchronization Guide](../03_synchronization/3_synchronization.md)**
+**[Back to Overview](1_cuda_execution_model.md)** | **Previous: [Warp Execution Guide](3_warp_execution.md)** | **Next: [Synchronization Guide](../03_synchronization/1_synchronization.md)**
 
 ---
 
@@ -1153,9 +1153,9 @@ __global__ void dynamic_load_balance_kernel(float* data, int* work_queue,
 
 ##  **Related Guides**
 
-- **Next Step**: [Synchronization Guide](../03_synchronization/3_synchronization.md) - Master thread cooperation and barriers
-- **Foundation**: [ Warp Execution Guide](1b_warp_execution.md) - Warp-level programming
-- **Basics**: [ Thread Hierarchy Guide](1a_thread_hierarchy.md) - Thread organization fundamentals
+- **Next Step**: [Synchronization Guide](../03_synchronization/1_synchronization.md) - Master thread cooperation and barriers
+- **Foundation**: [ Warp Execution Guide](3_warp_execution.md) - Warp-level programming
+- **Basics**: [ Thread Hierarchy Guide](2_thread_hierarchy.md) - Thread organization fundamentals
 - **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---

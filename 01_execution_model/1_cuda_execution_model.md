@@ -5,11 +5,11 @@ Understanding the CUDA execution model is **essential** for writing performant G
 ##  Navigation Guide
 
 ###  **Detailed Section Files**
-- **[ Thread Hierarchy Complete Guide](1a_thread_hierarchy.md)** - Thread/Block/Grid organization, indexing patterns, dimensionality choices
-- **[ Warp Execution Advanced Guide](1b_warp_execution.md)** - SIMT model, divergence optimization, warp intrinsics, debugging
-- **[ Streaming Multiprocessors Deep Dive](1c_streaming_multiprocessors_deep.md)** - SM architecture, scheduling, occupancy tuning, resource management
-- **[Synchronization Complete Guide](../03_synchronization/3_synchronization.md)** - Thread barriers, cooperative groups, race condition prevention
-- **[ Execution Constraints Guide](1e_execution_constraints_guide.md)** - Hardware limits, resource tradeoffs, launch configuration validation
+- **[ Thread Hierarchy Complete Guide](2_thread_hierarchy.md)** - Thread/Block/Grid organization, indexing patterns, dimensionality choices
+- **[ Warp Execution Advanced Guide](3_warp_execution.md)** - SIMT model, divergence optimization, warp intrinsics, debugging
+- **[ Streaming Multiprocessors Deep Dive](4_streaming_multiprocessors_deep.md)** - SM architecture, scheduling, occupancy tuning, resource management
+- **[Synchronization Complete Guide](../03_synchronization/1_synchronization.md)** - Thread barriers, cooperative groups, race condition prevention
+- **[ Execution Constraints Guide](5_execution_constraints_guide.md)** - Hardware limits, resource tradeoffs, launch configuration validation
 
 ---
 
@@ -17,10 +17,10 @@ Understanding the CUDA execution model is **essential** for writing performant G
 
 | Level | Size | Scope | Hardware Mapping | Best For | Detailed Guide |
 |-------|------|-------|------------------|----------|----------------|
-| **Thread** | 1 unit | Private registers | CUDA core | Individual computations | [ Thread Guide](1a_thread_hierarchy.md) |
-| **Warp** | 32 threads | SIMT execution | Warp scheduler | Lockstep operations | [ Warp Guide](1b_warp_execution.md) |
-| **Block** | 1-1024 threads | Shared memory + sync | Part of SM | Cooperative algorithms | [ Thread Guide](1a_thread_hierarchy.md#blocks) |
-| **Grid** | Many blocks | Global scope | Entire GPU | Massive parallelism | [ Thread Guide](1a_thread_hierarchy.md#grids) |
+| **Thread** | 1 unit | Private registers | CUDA core | Individual computations | [ Thread Guide](2_thread_hierarchy.md) |
+| **Warp** | 32 threads | SIMT execution | Warp scheduler | Lockstep operations | [ Warp Guide](3_warp_execution.md) |
+| **Block** | 1-1024 threads | Shared memory + sync | Part of SM | Cooperative algorithms | [ Thread Guide](2_thread_hierarchy.md#blocks) |
+| **Grid** | Many blocks | Global scope | Entire GPU | Massive parallelism | [ Thread Guide](2_thread_hierarchy.md#grids) |
 
 ##  **Launch Configuration Quick Patterns**
 
@@ -225,14 +225,14 @@ ncu --metrics launch__occupancy_limit_warps,launch__occupancy_limit_blocks ./app
 ```
 GPU Performance Issue?
  Low SM utilization?
-    Increase occupancy → [ SM Guide](1c_streaming_multiprocessors_deep.md)
-    Fix launch configuration → [ Constraints Guide](1e_execution_constraints_guide.md)
+    Increase occupancy → [ SM Guide](4_streaming_multiprocessors_deep.md)
+    Fix launch configuration → [ Constraints Guide](5_execution_constraints_guide.md)
  Branch divergence issues?
-    Optimize warp execution → [ Warp Guide](1b_warp_execution.md)
+    Optimize warp execution → [ Warp Guide](3_warp_execution.md)
  Thread coordination problems?
-    Fix synchronization → [Sync Guide](../03_synchronization/3_synchronization.md)
+    Fix synchronization → [Sync Guide](../03_synchronization/1_synchronization.md)
  Indexing or memory access issues?
-    Review thread hierarchy → [ Thread Guide](1a_thread_hierarchy.md)
+    Review thread hierarchy → [ Thread Guide](2_thread_hierarchy.md)
  Need optimization examples?
      Study performance patterns → [ Examples Guide](1f_performance_examples.md)
 ```

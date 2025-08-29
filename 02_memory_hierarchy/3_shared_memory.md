@@ -2,7 +2,7 @@
 
 Shared memory is the key to unlocking maximum GPU performance. This guide covers advanced tiling techniques, bank conflict avoidance, and shared memory optimization patterns for high-performance CUDA kernels.
 
-**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Global Memory Guide2b_global_memory.md)** | **Next: [Constant Memory Guide](2d_constant_memory.md)**
+**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Global Memory Guide2_global_memory.md)** | **Next: [Constant Memory Guide](4_constant_memory.md)**
 
 ---
 
@@ -747,9 +747,9 @@ __global__ void gaussian_blur_shared(unsigned char* input, unsigned char* output
 
 ##  **Related Guides**
 
-- **Next Step**: [Constant Memory Complete Guide](2d_constant_memory.md) - Optimize read-only data access
-- **Previous**: [Global Memory Advanced Guide2b_global_memory.md) - Coalescing fundamentals
-- **Debugging**: [Memory Debugging Toolkit](2f_memory_debugging.md) - Troubleshoot shared memory issues
+- **Next Step**: [Constant Memory Complete Guide](4_constant_memory.md) - Optimize read-only data access
+- **Previous**: [Global Memory Advanced Guide2_global_memory.md) - Coalescing fundamentals
+- **Debugging**: [Memory Debugging Toolkit](6_memory_debugging.md) - Troubleshoot shared memory issues
 - **Overview**: [Memory Hierarchy Overview&cuda_memory_hierarchy.md) - Quick reference and navigation
 
 ---

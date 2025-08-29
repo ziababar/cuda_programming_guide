@@ -1,19 +1,19 @@
-#  CUDA - **[Global Memory Optimization](2b_global_memory.md)** - Coalescing patterns and performance analysis
-- **[Shared Memory Complete Guide](2c_shared_memory.md)** - Matrix multiplication, bank conflicts, benchmarks
-- **[Constant Memory Complete Guide](2d_constant_memory.md)** - Domain examples, optimization strategies
-- **[Unified Memory Complete Guide](2e_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
-- **[Memory Debugging Toolkit](2f_memory_debugging.md)** - Troubleshooting workflows and profiling strategiesy Hierarchy - Overview & Quick Reference
+#  CUDA - **[Global Memory Optimization](2_global_memory.md)** - Coalescing patterns and performance analysis
+- **[Shared Memory Complete Guide](3_shared_memory.md)** - Matrix multiplication, bank conflicts, benchmarks
+- **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
+- **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
+- **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategiesy Hierarchy - Overview & Quick Reference
 
 Understanding the CUDA memory hierarchy is **critical** for writing performant kernels. The choice of memory and access pattern dramatically impacts latency, bandwidth utilization, and overall throughput.
 
 ##  Navigation Guide
 
 ###  **Detailed Section Files**
-- **[Global Memory Optimization](2b_global_memory.md)** - Coalescing patterns and performance analysis
-- **[Shared Memory Complete Guide](2c_shared_memory.md)** - Matrix multiplication, bank conflicts, benchmarks
-- **[Constant Memory Complete Guide](2d_constant_memory.md)** - Domain examples, optimization strategies
-- **[Unified Memory Complete Guide](2e_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
-- **[Memory Debugging Toolkit](2f_memory_debugging.md)** - Troubleshooting workflows and profiling strategies
+- **[Global Memory Optimization](2_global_memory.md)** - Coalescing patterns and performance analysis
+- **[Shared Memory Complete Guide](3_shared_memory.md)** - Matrix multiplication, bank conflicts, benchmarks
+- **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
+- **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
+- **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategies
 
 ---
 
@@ -23,11 +23,11 @@ Understanding the CUDA memory hierarchy is **critical** for writing performant k
 |-------------|---------|------------|-------|----------|----------------|----------|----------------|
 | **Registers** | ~1 cycle | 32-255/thread | Thread | Kernel | Private to thread | Scalars, loop counters, temporary values | This guide |
 | **Local Memory** | 300-600 cycles | Unlimited | Thread | Kernel | Private (in global mem) | Arrays/structs too large for registers | This guide |
-| **Shared Memory** | ~2-3 cycles | 48-164 KB/block | Block | Kernel | Shared within block | Tile storage, cooperative block computation | [Shared Guide](2c_shared_memory.md) |
-| **Global Memory** | 300-600 cycles | GPU VRAM | All Threads | Application | Read/Write by all | Main memory for large input/output datasets | [Global Guide2b_global_memory.md) |
-| **Constant Memory** | ~1 cycle (cached) | 64 KB total | All Threads | Application | Broadcast to all (RO) | Lookup tables, config params, small readonly data | [Constant Guide](2d_constant_memory.md) |
+| **Shared Memory** | ~2-3 cycles | 48-164 KB/block | Block | Kernel | Shared within block | Tile storage, cooperative block computation | [Shared Guide](3_shared_memory.md) |
+| **Global Memory** | 300-600 cycles | GPU VRAM | All Threads | Application | Read/Write by all | Main memory for large input/output datasets | [Global Guide2_global_memory.md) |
+| **Constant Memory** | ~1 cycle (cached) | 64 KB total | All Threads | Application | Broadcast to all (RO) | Lookup tables, config params, small readonly data | [Constant Guide](4_constant_memory.md) |
 | **Texture/Surface** | ~1-10 cycles (cached) | GPU VRAM | All Threads | Application | Specialized read/write | 2D/3D spatial data, image processing | This guide |
-| **Unified Memory** | Variable | System RAM+GPU | CPU + GPU | Application | Auto-migrated host/device | Rapid development, shared CPU-GPU access | [Unified Guide](2e_unified_memory.md) |
+| **Unified Memory** | Variable | System RAM+GPU | CPU + GPU | Application | Auto-migrated host/device | Rapid development, shared CPU-GPU access | [Unified Guide](5_unified_memory.md) |
 
 
 ####  Registers
@@ -214,16 +214,16 @@ nsys profile --trace=cuda ./app
 ```
 Memory Performance Issue?
  Low global memory efficiency?
-    Fix coalescing → [Global Guide2b_global_memory.md)
-    Use shared memory tiling → [Shared Guide](2c_shared_memory.md)
+    Fix coalescing → [Global Guide2_global_memory.md)
+    Use shared memory tiling → [Shared Guide](3_shared_memory.md)
  Shared memory bank conflicts?
     Add padding, fix access patterns → [Shared Guide&shared_memory.md#bank-conflicts)
  Small uniform read-only data?
-    Use constant memory → [Constant Guide](2d_constant_memory.md)
+    Use constant memory → [Constant Guide](4_constant_memory.md)
  Complex CPU-GPU workflows?
-    Optimize unified memory → [Unified Guide](2e_unified_memory.md)
+    Optimize unified memory → [Unified Guide](5_unified_memory.md)
  Still having issues?
-     Systematic debugging → [Debug Guide2f_memory_debugging.md)
+     Systematic debugging → [Debug Guide6_memory_debugging.md)
 ```
 
 ##  **Key Principles**
@@ -236,10 +236,10 @@ Memory Performance Issue?
 
 ##  **Next Steps**
 
-1. **Start with**: [Global Memory Guide2b_global_memory.md) for coalescing basics
-2. **Then learn**: [Shared Memory Guide](2c_shared_memory.md) for advanced tiling
-3. **Specialize with**: [Constant2d_constant_memory.md) or [Unified2e_unified_memory.md) memory guides
-4. **Debug with**: [Debugging Toolkit](2f_memory_debugging.md) when performance issues arise
+1. **Start with**: [Global Memory Guide2_global_memory.md) for coalescing basics
+2. **Then learn**: [Shared Memory Guide](3_shared_memory.md) for advanced tiling
+3. **Specialize with**: [Constant4_constant_memory.md) or [Unified5_unified_memory.md) memory guides
+4. **Debug with**: [Debugging Toolkit](6_memory_debugging.md) when performance issues arise
 
 ---
 

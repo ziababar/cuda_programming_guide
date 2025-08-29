@@ -2,7 +2,7 @@
 
 Unified Memory simplifies GPU programming by providing a single memory space accessible from both CPU and GPU. This guide covers advanced unified memory techniques, migration optimization, and performance tuning for maximum efficiency.
 
-**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Constant Memory Guide](2d_constant_memory.md)** | **Next: [Memory Debugging Guide2f_memory_debugging.md)**
+**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Constant Memory Guide](4_constant_memory.md)** | **Next: [Memory Debugging Guide6_memory_debugging.md)**
 
 ---
 
@@ -1479,8 +1479,8 @@ __global__ void update_weights_kernel(float* weights, float* gradients,
 
 ##  **Related Guides**
 
-- **Next Step**: [Memory Debugging Complete Guide2f_memory_debugging.md) - Troubleshoot memory issues
-- **Previous**: [Constant Memory Complete Guide](2d_constant_memory.md) - Cached read-only access
+- **Next Step**: [Memory Debugging Complete Guide6_memory_debugging.md) - Troubleshoot memory issues
+- **Previous**: [Constant Memory Complete Guide](4_constant_memory.md) - Cached read-only access
 - **Performance**: [ Performance Benchmarking Guide&performance_benchmarking.md) - Systematic performance analysis
 - **Overview**: [ Memory Hierarchy Overview&cuda_memory_hierarchy.md) - Quick reference and navigation
 

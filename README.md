@@ -9,50 +9,68 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 
 ### Execution Model - [`01_execution_model/`](01_execution_model/)
 - **[Execution Model](01_execution_model/1_cuda_execution_model.md)** - High-level concepts and navigation
-- **[Thread Hierarchy](01_execution_model/1a_thread_hierarchy.md)** - Thread/Block/Grid organization and indexing
-- **[Warp Execution](01_execution_model/1b_warp_execution.md)** - SIMT model, divergence, and optimization
-- **[Streaming Multiprocessors Deep Dive](01_execution_model/1c_streaming_multiprocessors_deep.md)** - SM architecture and occupancy
-- **[Execution Constraints Guide](01_execution_model/1e_execution_constraints_guide.md)** - Hardware limits and best practices
+- **[Thread Hierarchy](01_execution_model/2_thread_hierarchy.md)** - Thread/Block/Grid organization and indexing
+- **[Warp Execution](01_execution_model/3_warp_execution.md)** - SIMT model, divergence, and optimization
+- **[Streaming Multiprocessors Deep Dive](01_execution_model/4_streaming_multiprocessors_deep.md)** - SM architecture and occupancy
+- **[Execution Constraints Guide](01_execution_model/5_execution_constraints_guide.md)** - Hardware limits and best practices
 
 ### Memory Hierarchy - [`02_memory_hierarchy/`](02_memory_hierarchy/)
-- **[Memory Hierarchy](02_memory_hierarchy/2_cuda_memory_hierarchy.md)** - Memory types and access patterns
-- **[Global Memory](02_memory_hierarchy/2b_global_memory.md)** - Coalescing and optimization strategies
-- **[Shared Memory](02_memory_hierarchy/2c_shared_memory.md)** - Bank conflicts and performance tuning
-- **[Constant Memory](02_memory_hierarchy/2d_constant_memory.md)** - Broadcast patterns and use cases
-- **[Unified Memory](02_memory_hierarchy/2e_unified_memory.md)** - Advanced techniques and multi-GPU
-- **[Memory Debugging](02_memory_hierarchy/2f_memory_debugging.md)** - Profiling and troubleshooting
+- **[Memory Hierarchy](02_memory_hierarchy/1_cuda_memory_hierarchy.md)** - Memory types and access patterns
+- **[Global Memory](02_memory_hierarchy/2_global_memory.md)** - Coalescing and optimization strategies
+- **[Shared Memory](02_memory_hierarchy/3_shared_memory.md)** - Bank conflicts and performance tuning
+- **[Constant Memory](02_memory_hierarchy/4_constant_memory.md)** - Broadcast patterns and use cases
+- **[Unified Memory](02_memory_hierarchy/5_unified_memory.md)** - Advanced techniques and multi-GPU
+- **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
 
 ### Synchronization - [`03_synchronization/`](03_synchronization/)
-- **[Synchronization](03_synchronization/3_synchronization.md)** - Thread coordination and cooperation patterns
+- **[Synchronization](03_synchronization/1_synchronization.md)** - Thread coordination and cooperation patterns
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
-- **[CUDA Streams](04_streams_concurrency/4a_cuda_streams.md)** - Asynchronous execution concepts
-- **[CUDA Streams Concurrency](04_streams_concurrency/4_cuda_streams_concurrency.md)** - Advanced patterns and optimization
+- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
+- **[CUDA Streams](04_streams_concurrency/2_cuda_streams.md)** - Asynchronous execution concepts
 
 ### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
-- **[CUDA Profiling](05_performance_profiling/5_cuda_profiling.md)** - Tools and techniques for performance analysis
+- **[CUDA Profiling](05_performance_profiling/1_cuda_profiling.md)** - Tools and techniques for performance analysis
+
+### Memory Hierarchy - [`02_memory_hierarchy/`](02_memory_hierarchy/)
+- **[Memory Hierarchy](02_memory_hierarchy/1_cuda_memory_hierarchy.md)** - Memory types and access patterns
+- **[Global Memory](02_memory_hierarchy/2_global_memory.md)** - Coalescing and optimization strategies
+- **[Shared Memory](02_memory_hierarchy/3_shared_memory.md)** - Bank conflicts and performance tuning
+- **[Constant Memory](02_memory_hierarchy/4_constant_memory.md)** - Broadcast patterns and use cases
+- **[Unified Memory](02_memory_hierarchy/5_unified_memory.md)** - Advanced techniques and multi-GPU
+- **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
+
+### Synchronization - [`03_synchronization/`](03_synchronization/)
+- **[Synchronization](03_synchronization/1_synchronization.md)** - Thread coordination and cooperation patterns
+
+### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
+- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
+- **[CUDA Streams](04_streams_concurrency/2_cuda_streams.md)** - Asynchronous execution concepts
+
+### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
+- **[CUDA Profiling](05_performance_profiling/1_cuda_profiling.md)** - Tools and techniques for performance analysis
 
 ## Learning Path Recommendations
 
 ### **Beginner Path**
 1. Start with [CUDA Cheat Sheet](00_quick_start/0_cuda_cheat_sheet.md) for essential concepts
 2. Read [Execution Model](01_execution_model/1_cuda_execution_model.md)
-3. Study [Thread Hierarchy](01_execution_model/1a_thread_hierarchy.md)
-4. Learn [Memory Hierarchy](02_memory_hierarchy/2_cuda_memory_hierarchy.md)
-5. Practice with [Global Memory](02_memory_hierarchy/2b_global_memory.md)
+3. Study [Thread Hierarchy](01_execution_model/2_thread_hierarchy.md)
+4. Learn [Memory Hierarchy](02_memory_hierarchy/1_cuda_memory_hierarchy.md)
+5. Practice with [Global Memory](02_memory_hierarchy/2_global_memory.md)
 
 ### **Intermediate Path**
-1. Deep dive into [Warp Execution](01_execution_model/1b_warp_execution.md)
-2. Understand [Streaming Multiprocessors Deep Dive](01_execution_model/1c_streaming_multiprocessors_deep.md)
-3. Learn [Shared Memory](02_memory_hierarchy/2c_shared_memory.md)
-4. Master [Synchronization](03_synchronization/3_synchronization.md)
-5. Apply [CUDA Profiling](05_performance_profiling/5_cuda_profiling.md) techniques
+1. Deep dive into [Warp Execution](01_execution_model/3_warp_execution.md)
+2. Understand [Streaming Multiprocessors Deep Dive](01_execution_model/4_streaming_multiprocessors_deep.md)
+3. Learn [Shared Memory](02_memory_hierarchy/3_shared_memory.md)
+4. Master [Synchronization](03_synchronization/1_synchronization.md)
+5. Apply [CUDA Profiling](05_performance_profiling/1_cuda_profiling.md) techniques
 
 ### **Advanced Path**
-1. Optimize with [Execution Constraints Guide](01_execution_model/1e_execution_constraints_guide.md)
-2. Master [Unified Memory](02_memory_hierarchy/2e_unified_memory.md)
-3. Implement [CUDA Streams Concurrency](04_streams_concurrency/4_cuda_streams_concurrency.md)
-4. Debug with [Memory Debugging](02_memory_hierarchy/2f_memory_debugging.md)
+1. Optimize with [Execution Constraints Guide](01_execution_model/5_execution_constraints_guide.md)
+2. Master [Unified Memory](02_memory_hierarchy/5_unified_memory.md)
+3. Implement [CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)
+4. Debug with [Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)
 5. Apply all concepts in real projects
 
 ## Prerequisites

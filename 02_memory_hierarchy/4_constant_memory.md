@@ -2,7 +2,7 @@
 
 Constant memory provides cached, broadcast-optimized access to read-only data across all threads. This guide covers advanced constant memory techniques, domain-specific applications, and optimization strategies for maximum performance.
 
-**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Shared Memory Guide](2c_shared_memory.md)** | **Next: [Unified Memory Guide](2e_unified_memory.md)**
+**[Back to Overview&cuda_memory_hierarchy.md)** | **Previous: [Shared Memory Guide](3_shared_memory.md)** | **Next: [Unified Memory Guide](5_unified_memory.md)**
 
 ---
 
@@ -1194,9 +1194,9 @@ void analyze_cache_performance() {
 
 ##  **Related Guides**
 
-- **Next Step**: [Unified Memory Complete Guide](2e_unified_memory.md) - Simplify memory management
-- **Previous**: [Shared Memory Complete Guide](2c_shared_memory.md) - Fast on-chip memory
-- **Debugging**: [Memory Debugging Toolkit](2f_memory_debugging.md) - Troubleshoot memory issues
+- **Next Step**: [Unified Memory Complete Guide](5_unified_memory.md) - Simplify memory management
+- **Previous**: [Shared Memory Complete Guide](3_shared_memory.md) - Fast on-chip memory
+- **Debugging**: [Memory Debugging Toolkit](6_memory_debugging.md) - Troubleshoot memory issues
 - **Overview**: [Memory Hierarchy Overview&cuda_memory_hierarchy.md) - Quick reference and navigation
 
 ---

@@ -2,7 +2,7 @@
 
 Global memory is the main data reservoir for CUDA kernels, but it's slow. This guide covers advanced optimization techniques for maximizing global memory performance through coalescing, access patterns, and bandwidth utilization.
 
-**[Back to Overview&cuda_memory_hierarchy.md)** | **Next: [Shared Memory Guide](2c_shared_memory.md)**
+**[Back to Overview&cuda_memory_hierarchy.md)** | **Next: [Shared Memory Guide](3_shared_memory.md)**
 
 ---
 
@@ -428,8 +428,8 @@ float measure_kernel_performance(void (*kernel_func)(float*, float*, int),
 
 ##  **Related Guides**
 
-- **Next Step**: [Shared Memory Complete Guide](2c_shared_memory.md) - Learn tiling techniques for further optimization
-- **Debugging**: [Memory Debugging Toolkit](2f_memory_debugging.md) - Systematic approach to memory issues
+- **Next Step**: [Shared Memory Complete Guide](3_shared_memory.md) - Learn tiling techniques for further optimization
+- **Debugging**: [Memory Debugging Toolkit](6_memory_debugging.md) - Systematic approach to memory issues
 - **Overview**: [Memory Hierarchy Overview&cuda_memory_hierarchy.md) - Quick reference and navigation
 
 ---

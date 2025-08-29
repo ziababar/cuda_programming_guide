@@ -2,7 +2,7 @@
 
 CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. This comprehensive guide series covers everything from fundamentals to advanced production patterns.
 
-**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../02_memory_hierarchy/2_cuda_memory_hierarchy.md)** | **Architecture: [Execution Model](../01_execution_model/1_cuda_execution_model.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../02_memory_hierarchy/1_cuda_memory_hierarchy.md)** | **Architecture: [Execution Model](../01_execution_model/1_cuda_execution_model.md)**
 
 ---
 

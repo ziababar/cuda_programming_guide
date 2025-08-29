@@ -2,7 +2,7 @@
 
 Synchronization is the cornerstone of parallel programming in CUDA. Understanding how threads coordinate, share data safely, and maintain consistency is essential for writing correct and efficient GPU applications.
 
-**[Back to Execution Model](../01_execution_model/1_cuda_execution_model.md)** | **Previous: [Streaming Multiprocessors Guide](../01_execution_model/1c_streaming_multiprocessors_deep.md)** | **Next: [Memory Hierarchy](../02_memory_hierarchy/2_cuda_memory_hierarchy.md)**
+**[Back to Execution Model](../01_execution_model/1_cuda_execution_model.md)** | **Previous: [Streaming Multiprocessors Guide](../01_execution_model/4_streaming_multiprocessors_deep.md)** | **Next: [Memory Hierarchy](../02_memory_hierarchy/1_cuda_memory_hierarchy.md)**
 
 ---
 
@@ -1310,9 +1310,9 @@ void run_pipeline(float* h_data, int N) {
 
 ##  **Related Guides**
 
-- **Next Step**: [ Execution Constraints Guide](1e_execution_constraints_guide.md) - Resource limits and workarounds
-- **Foundation**: [ Streaming Multiprocessors Guide](1c_streaming_multiprocessors_deep.md) - SM architecture and scheduling
-- **Parallelism**: [ Warp Execution Guide](1b_warp_execution.md) - Warp-level coordination
+- **Next Step**: [ Execution Constraints Guide](5_execution_constraints_guide.md) - Resource limits and workarounds
+- **Foundation**: [ Streaming Multiprocessors Guide](4_streaming_multiprocessors_deep.md) - SM architecture and scheduling
+- **Parallelism**: [ Warp Execution Guide](3_warp_execution.md) - Warp-level coordination
 - **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
