@@ -32,7 +32,7 @@ Try powers of two:
 - 256 threads/block (common sweet spot)
 - 512 threads/block
 
-#### Why it matters
+ **Why it matters**:
 - Impacts **occupancy** (how many warps/blocks can fit on an SM)
 - Affects **coalescing patterns** in global memory
 - Influences **register/shared memory pressure**
@@ -57,7 +57,7 @@ for (int k = 0; k < N/TILE_SIZE; ++k) {
 }
 ```
 
-#### Why it matters
+ **Why it matters**:
 - Greatly improves **data locality**
 - Reduces **global memory traffic**
 - Enhances **shared memory reuse**
@@ -75,7 +75,7 @@ for (int i = 0; i < 4; i++) {
 }
 ```
 
-#### Why it matters
+ **Why it matters**:
 - Reduces loop control overhead
 - Increases **Instruction-Level Parallelism (ILP)**
 - Gives compiler more opportunity to optimize

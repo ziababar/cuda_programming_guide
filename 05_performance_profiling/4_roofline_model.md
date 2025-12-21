@@ -52,7 +52,7 @@ The intersection of your kernel’s **OI** and the roofline curve tells you what
 
 These are limited by bandwidth — they spend more time waiting on memory than doing useful computation.
 
-##### Strategies:
+ Strategies:
 - **Improve memory coalescing**: Align memory access patterns across warps.
 - **Use shared memory**: Temporarily cache data to reduce global memory loads.
 - **Minimize transfers**: Avoid redundant memory reads/writes.
@@ -62,7 +62,7 @@ These are limited by bandwidth — they spend more time waiting on memory than d
 
 These are limited by ALU throughput — they max out the FP units before exhausting memory.
 
-##### Strategies:
+ Strategies:
 - **Increase ILP**: Schedule multiple independent instructions to reduce stalls.
 - **Reduce warp divergence**: Ensure uniform control flow across threads.
 - **Loop unrolling**: Reduces instruction dispatch overhead and enables more aggressive compiler optimizations.

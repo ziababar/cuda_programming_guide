@@ -2,9 +2,7 @@
 
 Advanced synchronization patterns enable complex algorithms and high-performance coordination.
 
-**Previous: [Debugging Synchronization](7_synchronization_debugging.md)**
-
----
+**Previous: [Debugging Synchronization](7_synchronization_debugging.md)** | **Next: [Execution Constraints Guide](../01_execution_model/5_execution_constraints_guide.md)**
 
 ##  **Advanced Patterns**
 
@@ -133,19 +131,19 @@ void run_pipeline(float* h_data, int N) {
 
 ##  **Key Takeaways**
 
-1. **Understand Scope**: Choose the right synchronization level for your coordination needs
-2. **Block Barriers**: Use `__syncthreads()` for shared memory coordination within blocks
-3. **Warp Primitives**: Leverage SIMT properties and warp-level primitives for efficient coordination
-4. **Atomic Operations**: Use atomics judiciously - reduce contention through aggregation
-5. **Memory Consistency**: Understand memory fences and consistency models for correct behavior
-6. **Debug Systematically**: Use systematic testing to identify and fix synchronization bugs
+1. ** Understand Scope**: Choose the right synchronization level for your coordination needs
+2. ** Block Barriers**: Use `__syncthreads()` for shared memory coordination within blocks
+3. ** Warp Primitives**: Leverage SIMT properties and warp-level primitives for efficient coordination
+4. ** Atomic Operations**: Use atomics judiciously - reduce contention through aggregation
+5. ** Memory Consistency**: Understand memory fences and consistency models for correct behavior
+6. ** Debug Systematically**: Use systematic testing to identify and fix synchronization bugs
 
 ##  **Related Guides**
 
-- **Next Step**: [Execution Constraints Guide](../01_execution_model/5_execution_constraints_guide.md) - Resource limits and workarounds
-- **Foundation**: [Streaming Multiprocessors Guide](../01_execution_model/4_streaming_multiprocessors_deep.md) - SM architecture and scheduling
-- **Parallelism**: [Warp Execution Guide](../01_execution_model/3_warp_execution.md) - Warp-level coordination
-- **Overview**: [Execution Model Overview](../01_execution_model/1_cuda_execution_model.md) - Quick reference and navigation
+- **Next Step**: [ Execution Constraints Guide](../01_execution_model/5_execution_constraints_guide.md) - Resource limits and workarounds
+- **Foundation**: [ Streaming Multiprocessors Guide](../01_execution_model/4_streaming_multiprocessors_deep.md) - SM architecture and scheduling
+- **Parallelism**: [ Warp Execution Guide](../01_execution_model/3_warp_execution.md) - Warp-level coordination
+- **Overview**: [ Execution Model Overview](../01_execution_model/1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
 

@@ -29,33 +29,31 @@ int maxActiveBlocks;
 cudaOccupancyMaxActiveBlocksPerMultiprocessor(&maxActiveBlocks, myKernel, threadsPerBlock, sharedMemPerBlock);
 ```
 
-### Factors That Influence Occupancy
+ Factors That Influence Occupancy
 | Factor	| Description |
-|---|---|
+|-------------------------|---------------------------------------------|
 | Threads per Block	| Larger blocks allow more warps but may exceed register or shared memory limits |
 | Registers per Thread	| High register use may limit number of active warps |
 | Shared Memory per Block	| Using too much shared memory reduces block concurrency |
 | Warp Scheduling Limits	| SMs have hardware limits (e.g., 64 warps, 2048 threads, 16 blocks) |
 
-### Common Pitfall
+ Common Pitfall
 Too high occupancy may:
 - Cause register spilling (to local/global memory)
 - Increase contention for shared memory or caches
 - Limit instruction-level parallelism (ILP)
 
-### Best Practices
+ Best Practices
 - Aim for balanced occupancy (50–80%) unless your kernel is extremely latency-bound.
-- Use `--ptxas-options=-v` with `nvcc` to inspect register and shared memory usage:
+- Use --ptxas-options=-v with nvcc to inspect register and shared memory usage:
 
-```bash
 nvcc -arch=sm_80 --ptxas-options=-v mykernel.cu
-```
 
 - Profile with Nsight Compute:
     - Look at Achieved Occupancy
     - Compare performance across different launch configurations
 
-### Real-World Example
+ Real-World Example
 Matrix multiplication kernel:
 - Initial config: 512 threads/block → High register usage → Only 2 blocks per SM.
 - Tuning: Reduced threads to 256/block, reduced register pressure via compiler flags.
