@@ -23,14 +23,28 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
 
 ### Synchronization - [`03_synchronization/`](03_synchronization/)
-- **[Synchronization](03_synchronization/1_synchronization.md)** - Thread coordination and cooperation patterns
+- **[Synchronization Fundamentals](03_synchronization/1_synchronization_basics.md)** - Basics of thread coordination
+- **[Block-Level Synchronization](03_synchronization/2_block_synchronization.md)** - Barriers and shared memory
+- **[Warp-Level Synchronization](03_synchronization/3_warp_synchronization.md)** - SIMT and warp primitives
+- **[Grid-Level Coordination](03_synchronization/4_grid_coordination.md)** - Multi-kernel and global patterns
+- **[Atomic Operations](03_synchronization/5_atomic_operations.md)** - Thread-safe memory access
+- **[Memory Consistency](03_synchronization/6_memory_consistency.md)** - Memory ordering and fences
+- **[Debugging Synchronization](03_synchronization/7_synchronization_debugging.md)** - Tools and techniques
+- **[Advanced Patterns](03_synchronization/8_advanced_synchronization.md)** - Wave and pipeline synchronization
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
 - **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
 - **[CUDA Streams](04_streams_concurrency/2_cuda_streams.md)** - Asynchronous execution concepts
 
 ### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
-- **[CUDA Profiling](05_performance_profiling/1_cuda_profiling.md)** - Tools and techniques for performance analysis
+- **[Profiling Overview](05_performance_profiling/1_profiling_overview.md)** - Key tools and concepts
+- **[Nsight Systems](05_performance_profiling/2_nsight_systems.md)** - Timeline debugging
+- **[Nsight Compute](05_performance_profiling/3_nsight_compute.md)** - Kernel performance analysis
+- **[Roofline Model](05_performance_profiling/4_roofline_model.md)** - Bottleneck visualization
+- **[Optimization Strategies](05_performance_profiling/5_optimization_strategies.md)** - Memory and compute tuning
+- **[Occupancy Analysis](05_performance_profiling/6_occupancy_analysis.md)** - Maximizing GPU utilization
+- **[Kernel Launch Tuning](05_performance_profiling/7_kernel_launch_tuning.md)** - Grid and block configuration
+- **[Detecting Bottlenecks](05_performance_profiling/8_detecting_bottlenecks.md)** - Root cause analysis
 
 ### Memory Hierarchy - [`02_memory_hierarchy/`](02_memory_hierarchy/)
 - **[Memory Hierarchy](02_memory_hierarchy/1_cuda_memory_hierarchy.md)** - Memory types and access patterns
@@ -63,8 +77,8 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 1. Deep dive into [Warp Execution](01_execution_model/3_warp_execution.md)
 2. Understand [Streaming Multiprocessors Deep Dive](01_execution_model/4_streaming_multiprocessors_deep.md)
 3. Learn [Shared Memory](02_memory_hierarchy/3_shared_memory.md)
-4. Master [Synchronization](03_synchronization/1_synchronization.md)
-5. Apply [CUDA Profiling](05_performance_profiling/1_cuda_profiling.md) techniques
+4. Master [Synchronization Fundamentals](03_synchronization/1_synchronization_basics.md) and [Block-Level Sync](03_synchronization/2_block_synchronization.md)
+5. Apply [Profiling Overview](05_performance_profiling/1_profiling_overview.md) techniques
 
 ### **Advanced Path**
 1. Optimize with [Execution Constraints Guide](01_execution_model/5_execution_constraints_guide.md)

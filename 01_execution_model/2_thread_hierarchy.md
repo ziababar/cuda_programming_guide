@@ -1261,7 +1261,7 @@ __device__ float detect_corner_harris(float* image, int width, int height,
 
 - **Next Step**: [ Warp Execution Advanced Guide](3_warp_execution.md) - Master SIMT execution
 - **Performance**: [ Streaming Multiprocessors Guide](4_streaming_multiprocessors_deep.md) - Optimize SM utilization
-- **Coordination**: [Synchronization Guide](../03_synchronization/1_synchronization.md) - Thread cooperation patterns
+- **Coordination**: [Synchronization Guide](../03_synchronization/1_synchronization_basics.md) - Thread cooperation patterns
 - **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---

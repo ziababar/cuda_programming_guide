@@ -54,7 +54,17 @@ C-0...C-N C-0...C-N C-0...C-N
 
  **Best Practice**: Align your kernel design to problem geometry (e.g. 2D grid for images).
 
-![Grid of Thread Blocks](../images/grid-of-thread-blocks.png)
+```
+         Grid (Kernel Launch)
+                  |
+        +---------+---------+
+        |                   |
+    Block (0,0)         Block (1,0)  ...
+        |                   |
+   +----+----+         +----+----+
+   |         |         |         |
+Thread(0,0) Thread(1,0) ...     ...
+```
 
 **Execution Flow:**
 1. **Kernel Launch**: Host launches a grid of thread blocks
@@ -103,7 +113,17 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 - Avoid shared memory **bank conflicts**
 
 
-![Memory Hierarchy](../images/memory-hierarchy.png)
+```
+      Registers (Thread Private)
+                 |
+    Shared Memory / L1 Cache (Block Local)
+                 |
+      L2 Cache (Global, All SMs)
+                 |
+      Global Memory (Device DRAM)
+                 |
+      System Memory (Host RAM)
+```
 
 **Memory Access Patterns:**
 1. **Registers**: Fastest access, private to each thread, limited capacity (~64KB per SM)

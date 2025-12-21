@@ -1568,7 +1568,7 @@ ProductionMemoryManager g_memory_manager;
 
 ##  **Related Guides**
 
-- **Next Step**: [Performance Benchmarking Guide](../05_performance_profiling/1_cuda_profiling.md) - Systematic performance analysis
+- **Next Step**: [Performance Benchmarking Guide](../05_performance_profiling/1_profiling_overview.md) - Systematic performance analysis
 - **Previous**: [Unified Memory Complete Guide](5_unified_memory.md) - Advanced memory management
 - **Tools Reference**: [Memory Hierarchy Overview](1_cuda_memory_hierarchy.md) - Quick debugging reference
 

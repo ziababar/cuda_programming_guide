@@ -1215,7 +1215,7 @@ __global__ void update_particles_warp_optimized(Particle* particles,
 
 - **Next Step**: [ Streaming Multiprocessors Guide](4_streaming_multiprocessors_deep.md) - Understand SM architecture and scheduling
 - **Foundation**: [ Thread Hierarchy Guide](2_thread_hierarchy.md) - Thread organization fundamentals
-- **Coordination**: [Synchronization Guide](../03_synchronization/1_synchronization.md) - Thread cooperation beyond warps
+- **Coordination**: [Synchronization Guide](../03_synchronization/1_synchronization_basics.md) - Thread cooperation beyond warps
 - **Overview**: [ Execution Model Overview](1_cuda_execution_model.md) - Quick reference and navigation
 
 ---
