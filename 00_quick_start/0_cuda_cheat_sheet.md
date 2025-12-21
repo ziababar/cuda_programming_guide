@@ -15,16 +15,8 @@
  **Best Practice**: Choose GPU based on workload requirements (compute vs memory intensive).
 
 ###  **Hardware Hierarchy**
-```
-         GPU Device
-              |
 
-   SM-0 SM-1    ... SM-N
-    |         |           |
-
-C-0...C-N C-0...C-N C-0...C-N
-(CUDA Cores per SM)
-```
+![GPU Architecture](../images/gpu_architecture.png)
 
 **Key Specifications (Example: A100)**:
 - **SMs**: 108 Streaming Multiprocessors
