@@ -4,8 +4,6 @@ Advanced synchronization patterns enable complex algorithms and high-performance
 
 **Previous: [Debugging Synchronization](7_synchronization_debugging.md)** | **Next: [Execution Constraints Guide](../01_execution_model/5_execution_constraints_guide.md)**
 
----
-
 ##  **Advanced Patterns**
 
 ###  **Wave Synchronization**
