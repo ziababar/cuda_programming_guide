@@ -34,7 +34,6 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
 - **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
-- **[CUDA Streams](04_streams_concurrency/2_cuda_streams.md)** - Asynchronous execution concepts
 
 ### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
 - **[Profiling Overview](05_performance_profiling/1_profiling_overview.md)** - Key tools and concepts
@@ -45,24 +44,6 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Occupancy Analysis](05_performance_profiling/6_occupancy_analysis.md)** - Maximizing GPU utilization
 - **[Kernel Launch Tuning](05_performance_profiling/7_kernel_launch_tuning.md)** - Grid and block configuration
 - **[Detecting Bottlenecks](05_performance_profiling/8_detecting_bottlenecks.md)** - Root cause analysis
-
-### Memory Hierarchy - [`02_memory_hierarchy/`](02_memory_hierarchy/)
-- **[Memory Hierarchy](02_memory_hierarchy/1_cuda_memory_hierarchy.md)** - Memory types and access patterns
-- **[Global Memory](02_memory_hierarchy/2_global_memory.md)** - Coalescing and optimization strategies
-- **[Shared Memory](02_memory_hierarchy/3_shared_memory.md)** - Bank conflicts and performance tuning
-- **[Constant Memory](02_memory_hierarchy/4_constant_memory.md)** - Broadcast patterns and use cases
-- **[Unified Memory](02_memory_hierarchy/5_unified_memory.md)** - Advanced techniques and multi-GPU
-- **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
-
-### Synchronization - [`03_synchronization/`](03_synchronization/)
-- **[Synchronization](03_synchronization/1_synchronization.md)** - Thread coordination and cooperation patterns
-
-### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
-- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
-- **[CUDA Streams](04_streams_concurrency/2_cuda_streams.md)** - Asynchronous execution concepts
-
-### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
-- **[CUDA Profiling](05_performance_profiling/1_cuda_profiling.md)** - Tools and techniques for performance analysis
 
 ## Learning Path Recommendations
 
