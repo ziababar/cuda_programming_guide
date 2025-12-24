@@ -20,6 +20,17 @@ CUDA provides multiple levels of synchronization, each with different scopes, pe
 | **Grid** | Entire kernel | Kernel boundaries | Slow | Multi-stage algorithms |
 | **Device** | Multiple kernels | `cudaDeviceSynchronize()` | Very slow | Host-device coordination |
 
+### **Memory Ordering & Fences**
+
+Synchronization is not just about timing; it's about **memory visibility**.
+
+- **`__syncthreads()`**: Barrier for all threads in a block + memory fence (shared/global).
+- **`__threadfence_block()`**: Ensures memory writes are visible to all threads in the *block*.
+- **`__threadfence()`**: Ensures memory writes are visible to all threads in the *device*.
+- **`__threadfence_system()`**: Ensures memory writes are visible to *entire system* (Host + Device).
+
+> **Crucial**: Fences do *not* pause threads (like `__syncthreads()` does). They only enforce memory ordering.
+
 ###  **Synchronization Models**
 
 #### **Barrier Synchronization:**
@@ -50,6 +61,25 @@ __global__ void barrier_synchronization_demo() {
         }
         printf("Block sum: %.2f\n", sum);
     }
+}
+```
+
+#### **Modern Synchronization (C++20 / CUDA 11+)**
+CUDA 11 introduced `cuda::barrier` and `cuda::pipeline` for more flexible synchronization, similar to C++20 standard library features.
+
+```cpp
+#include <cuda/barrier>
+#include <cuda/pipeline>
+
+__global__ void modern_sync_demo(float* data, int N) {
+    // Basic block barrier using libcu++
+    __shared__ cuda::barrier<cuda::thread_scope_block> bar;
+    if (threadIdx.x == 0) init(&bar, blockDim.x);
+    __syncthreads();
+
+    // Do work...
+    // Arrive and wait
+    bar.arrive_and_wait();
 }
 ```
 
