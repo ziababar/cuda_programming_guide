@@ -55,59 +55,32 @@ __global__ void barrier_synchronization_demo() {
 
 #### **Producer-Consumer Pattern:**
 ```cpp
-// Producer-consumer synchronization with shared memory
+// Producer-consumer pattern using phases to avoid deadlock
+// Note: __syncthreads() must be called by ALL threads in the block
 __global__ void producer_consumer_demo() {
-    __shared__ float buffer[128];
-    __shared__ int write_pos;
-    __shared__ int read_pos;
-    __shared__ int data_count;
-
+    __shared__ float buffer[256];
     int tid = threadIdx.x;
 
-    // Initialize shared variables
-    if (tid == 0) {
-        write_pos = 0;
-        read_pos = 0;
-        data_count = 0;
+    // Phase 1: Producer Phase
+    // All threads participate or wait at the same barrier
+    if (tid < 128) {
+        // First 128 threads produce data
+        buffer[tid] = tid * 2.0f;
     }
+    // Wait for all producers to finish writing
     __syncthreads();
 
-    // Producer threads (first half)
-    if (tid < blockDim.x / 2) {
-        for (int i = 0; i < 4; i++) {  // Each producer creates 4 items
-            float data = tid * 4 + i;
-
-            // Wait for buffer space
-            while (data_count >= 128) {
-                __syncthreads();
-            }
-
-            // Produce data
-            int pos = atomicAdd(&write_pos, 1) % 128;
-            buffer[pos] = data;
-            atomicAdd(&data_count, 1);
-
-            __syncthreads();
-        }
+    // Phase 2: Consumer Phase
+    // All threads can now safely read the produced data
+    if (tid >= 128) {
+        // Consumers read data produced by others
+        // e.g. Thread 128 reads from index 0
+        int read_idx = tid - 128;
+        float data = buffer[read_idx];
+        printf("Consumer %d read: %.2f\n", tid, data);
     }
-    // Consumer threads (second half)
-    else {
-        for (int i = 0; i < 2; i++) {  // Each consumer processes 2 items
-            // Wait for data
-            while (data_count <= 0) {
-                __syncthreads();
-            }
 
-            // Consume data
-            int pos = atomicAdd(&read_pos, 1) % 128;
-            float data = buffer[pos];
-            atomicSub(&data_count, 1);
-
-            // Process data
-            printf("Consumer %d processed: %.1f\n", tid, data);
-
-            __syncthreads();
-        }
-    }
+    // Optional: Barrier if you need to reuse buffer for next iteration
+    __syncthreads();
 }
 ```

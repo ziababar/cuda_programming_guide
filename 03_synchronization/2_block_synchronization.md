@@ -114,39 +114,45 @@ __global__ void block_reduction_optimized(float* input, float* output, int N) {
     }
 }
 
-// Warp-optimized reduction (no sync needed within warp)
+// Warp-optimized reduction using shuffle intrinsics (Modern CUDA)
+// Requires Compute Capability 3.0+
 template<int BLOCK_SIZE>
 __global__ void warp_optimized_reduction(float* input, float* output, int N) {
-    __shared__ float shared_data[BLOCK_SIZE];
-
+    __shared__ float shared_data[BLOCK_SIZE / 32]; // One element per warp
     int tid = threadIdx.x;
+    int lane = tid % 32;
+    int wid = tid / 32;
     int global_id = blockIdx.x * blockDim.x + tid;
 
-    // Load and reduce in shared memory
-    shared_data[tid] = (global_id < N) ? input[global_id] : 0.0f;
-    __syncthreads();
+    // 1. Load data
+    float val = (global_id < N) ? input[global_id] : 0.0f;
 
-    // Reduce to 32 elements (1 per warp)
-    for (int stride = BLOCK_SIZE / 2; stride > 32; stride >>= 1) {
-        if (tid < stride) {
-            shared_data[tid] += shared_data[tid + stride];
+    // 2. Warp-level reduction using shuffle
+    // Butterfly reduction for sum
+    for (int offset = 16; offset > 0; offset /= 2) {
+        val += __shfl_down_sync(0xffffffff, val, offset);
+    }
+
+    // 3. Store warp result to shared memory
+    if (lane == 0) {
+        shared_data[wid] = val;
+    }
+    __syncthreads(); // Wait for all warps to write
+
+    // 4. Final reduction by first warp
+    if (wid == 0) {
+        // Load warp sums (only first warp needs to act)
+        val = (tid < (BLOCK_SIZE / 32)) ? shared_data[lane] : 0.0f;
+
+        // Reduce remaining elements
+        for (int offset = 16; offset > 0; offset /= 2) {
+            val += __shfl_down_sync(0xffffffff, val, offset);
         }
-        __syncthreads();
-    }
 
-    // Final warp reduction (no __syncthreads needed)
-    if (tid < 32) {
-        // Manually unroll for efficiency
-        if (BLOCK_SIZE >= 64) shared_data[tid] += shared_data[tid + 32];
-        shared_data[tid] += shared_data[tid + 16];
-        shared_data[tid] += shared_data[tid + 8];
-        shared_data[tid] += shared_data[tid + 4];
-        shared_data[tid] += shared_data[tid + 2];
-        shared_data[tid] += shared_data[tid + 1];
-    }
-
-    if (tid == 0) {
-        output[blockIdx.x] = shared_data[0];
+        // Write block result
+        if (tid == 0) {
+            output[blockIdx.x] = val;
+        }
     }
 }
 ```

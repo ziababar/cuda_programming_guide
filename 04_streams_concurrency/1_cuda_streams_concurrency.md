@@ -4022,6 +4022,13 @@ public:
         producer_queue.pop();
 
         BufferSlot& slot = buffer_ring[buffer_id];
+
+        // Wait for the consumer to finish using this buffer
+        // Note: First use sequence_number is -1, so no event wait needed
+        if (slot.sequence_number != -1) {
+            cudaStreamWaitEvent(producer_stream, slot.consumed_event, 0);
+        }
+
         slot.data_size = data_size;
         slot.sequence_number = sequence_counter++;
         slot.is_producer_ready = false;
