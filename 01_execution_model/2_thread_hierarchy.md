@@ -1202,6 +1202,12 @@ __global__ void feature_detection_kernel(float* image, float* features,
                                                      col, row, scale);
 
         // Accumulate responses across scales
+        // Note: atomicAdd is strictly necessary only if multiple kernels/streams
+        // update the same pixel concurrently. Since our launch loop is sequential
+        // (cudaDeviceSynchronize), simple accumulation would suffice.
+        // features[idx] += feature_response;
+
+        // However, atomicAdd is safe for both sequential and concurrent cases
         atomicAdd(&features[idx], feature_response);
     }
 }
