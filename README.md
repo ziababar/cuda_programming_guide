@@ -33,7 +33,12 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Advanced Patterns](03_synchronization/8_advanced_synchronization.md)** - Wave and pipeline synchronization
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
-- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
+- **[Stream Fundamentals](04_streams_concurrency/1_stream_fundamentals.md)** - Stream types and execution model
+- **[Asynchronous Operations](04_streams_concurrency/2_asynchronous_operations.md)** - Compute-transfer overlap
+- **[Memory Transfer Optimization](04_streams_concurrency/3_memory_optimization.md)** - Pinned memory and bandwidth
+- **[Event-Driven Programming](04_streams_concurrency/4_event_management.md)** - Synchronization and timing
+- **[CUDA Graphs](04_streams_concurrency/5_cuda_graphs.md)** - Graph capture and execution
+- **[Advanced Patterns](04_streams_concurrency/6_advanced_patterns.md)** - Producer-consumer and pipelines
 
 ### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
 - **[Profiling Overview](05_performance_profiling/1_profiling_overview.md)** - Key tools and concepts
@@ -64,7 +69,7 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 ### **Advanced Path**
 1. Optimize with [Execution Constraints Guide](01_execution_model/5_execution_constraints_guide.md)
 2. Master [Unified Memory](02_memory_hierarchy/5_unified_memory.md)
-3. Implement [CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)
+3. Implement [Stream Fundamentals](04_streams_concurrency/1_stream_fundamentals.md) and [Advanced Patterns](04_streams_concurrency/6_advanced_patterns.md)
 4. Debug with [Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)
 5. Apply all concepts in real projects
 
