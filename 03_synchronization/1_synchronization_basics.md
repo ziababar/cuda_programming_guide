@@ -74,7 +74,9 @@ CUDA 11 introduced `cuda::barrier` and `cuda::pipeline` for more flexible synchr
 __global__ void modern_sync_demo(float* data, int N) {
     // Basic block barrier using libcu++
     __shared__ cuda::barrier<cuda::thread_scope_block> bar;
-    if (threadIdx.x == 0) init(&bar, blockDim.x);
+    if (threadIdx.x == 0) {
+        bar.init(blockDim.x);
+    }
     __syncthreads();
 
     // Do work...
