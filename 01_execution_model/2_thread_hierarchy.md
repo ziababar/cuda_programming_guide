@@ -78,6 +78,7 @@ Thread blocks enable cooperation through shared resources:
 #### **Shared Resources:**
 - **Shared Memory**: 48-164KB per block (architecture dependent)
 - **Synchronization**: `__syncthreads()` barriers
+- **Cooperative Groups**: `cooperative_groups::this_thread_block().sync()` (Modern alternative)
 - **Block-Wide Operations**: Voting, reduction patterns
 
 #### **Block Characteristics:**
@@ -698,18 +699,17 @@ public:
 };
 
 // Usage example
+// Note: This requires proper kernel function pointer casting or templates in real code
 void optimized_launch_example() {
     LaunchConfigOptimizer optimizer;
 
-    // Find optimal 1D configuration
-    int optimal_1d_block = optimizer.find_optimal_block_size(vector_kernel);
-    printf("Optimal 1D block size: %d\n", optimal_1d_block);
+    // Find optimal 1D configuration (Example usage)
+    // int optimal_1d_block = optimizer.find_optimal_block_size(vector_kernel);
+    // printf("Optimal 1D block size: %d\n", optimal_1d_block);
 
-    // Find optimal 2D configuration
-    dim3 optimal_2d_block = optimizer.find_best_2d_config(
-        matrix_kernel, 1024, 1024, 0);
-    printf("Optimal 2D block: (%d, %d)\n",
-           optimal_2d_block.x, optimal_2d_block.y);
+    // Find optimal 2D configuration (Example usage)
+    // dim3 optimal_2d_block = optimizer.find_best_2d_config(matrix_kernel, 1024, 1024, 0);
+    // printf("Optimal 2D block: (%d, %d)\n", optimal_2d_block.x, optimal_2d_block.y);
 }
 ```
 
