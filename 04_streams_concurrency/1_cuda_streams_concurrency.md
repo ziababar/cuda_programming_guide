@@ -55,6 +55,13 @@ CUDA streams represent ordered sequences of GPU operations that execute asynchro
 
 #### **Stream Hierarchy and Characteristics:**
 ```cpp
+#include <cstdio>
+#include <cmath>
+#include <chrono>
+
+// Forward declaration of kernel
+__global__ void simple_kernel(float* data, int N);
+
 // Comprehensive stream type demonstration
 void demonstrate_stream_fundamentals() {
     printf("=== CUDA Stream Fundamentals ===\n");
@@ -156,6 +163,16 @@ __global__ void simple_kernel(float* data, int N) {
 
 #### **Stream Execution Model:**
 ```cpp
+#include <cstdio>
+#include <cmath>
+
+// Forward declarations of kernels
+__global__ void preprocessing_kernel(float* data, int N);
+__global__ void processing_kernel(float* data, int N);
+__global__ void compute_intensive_kernel(float* data, int N);
+__global__ void postprocessing_kernel(float* data, int N);
+__global__ void initialization_kernel(float* data, int N);
+
 // Demonstrate FIFO ordering and inter-stream concurrency
 void demonstrate_stream_execution_model() {
     printf("=== Stream Execution Model ===\n");
@@ -277,6 +294,12 @@ __global__ void initialization_kernel(float* data, int N) {
 
 #### **Advanced Stream Management:**
 ```cpp
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cstdio>
+#include <iostream>
+
 // Sophisticated stream management for production applications
 class StreamManager {
 private:
@@ -504,6 +527,14 @@ The ability to overlap computation with memory transfers is one of the most powe
 
 #### **Basic Overlap Patterns:**
 ```cpp
+#include <cstdio>
+#include <cmath>
+#include <vector>
+
+// Forward declaration
+__global__ void complex_processing_kernel(float* input, float* output, int N);
+void pipeline_processing_demo(float* h_input, float* h_output, float* d_input, float* d_output, int N, cudaStream_t* streams, int num_streams);
+
 // Comprehensive compute-transfer overlap demonstration
 void demonstrate_compute_transfer_overlap() {
     const int N = 4 * 1024 * 1024;  // 4M elements
@@ -623,6 +654,14 @@ __global__ void complex_processing_kernel(float* input, float* output, int N) {
 
 #### **Advanced Pipeline Processing:**
 ```cpp
+#include <cstdio>
+#include <cmath>
+#include <vector>
+
+// Forward declarations
+__global__ void stage1_kernel(float* input, float* output, int N);
+__global__ void stage2_kernel(float* input, float* output, int N);
+
 // Sophisticated pipeline with multiple processing stages
 void pipeline_processing_demo(float* h_input, float* h_output,
                              float* d_input, float* d_output,
@@ -716,6 +755,20 @@ __global__ void stage2_kernel(float* input, float* output, int N) {
 
 #### **Comprehensive Synchronization Patterns:**
 ```cpp
+#include <vector>
+#include <map>
+#include <string>
+#include <cstdio>
+#include <cmath>
+
+// Forward declarations
+__global__ void parallel_work_kernel(int stream_id);
+__global__ void join_work_kernel();
+__global__ void pipeline_stage_kernel(int stage, int iteration);
+__global__ void initial_processing_kernel();
+__global__ void parallel_processing_kernel(int branch_id);
+__global__ void aggregation_kernel();
+
 // Advanced synchronization techniques for complex workflows
 class StreamSynchronizer {
 private:
@@ -962,6 +1015,12 @@ __global__ void aggregation_kernel() {
 
 #### **Adaptive Stream Allocation:**
 ```cpp
+#include <vector>
+#include <queue>
+#include <map>
+#include <chrono>
+#include <cstdio>
+
 // Dynamic stream management for varying workloads
 class AdaptiveStreamManager {
 private:
@@ -1171,6 +1230,14 @@ Pinned (page-locked) memory is essential for achieving maximum memory transfer b
 
 #### **Comprehensive Pinned Memory Management:**
 ```cpp
+#include <map>
+#include <cstdio>
+#include <vector>
+#include <cmath>
+
+// Forward declaration
+__global__ void zero_copy_kernel(float* data, int N);
+
 // Advanced pinned memory allocation and management
 class PinnedMemoryManager {
 private:
@@ -1381,6 +1448,9 @@ __global__ void zero_copy_kernel(float* data, int N) {
 
 #### **Memory Transfer Pattern Analysis:**
 ```cpp
+#include <vector>
+#include <cstdio>
+
 // Comprehensive bandwidth optimization techniques
 class BandwidthOptimizer {
 private:
@@ -1553,6 +1623,13 @@ private:
 
 #### **Bidirectional Transfer Optimization:**
 ```cpp
+#include <vector>
+#include <cstdio>
+#include <cmath>
+
+// Forward declaration
+__global__ void bidirectional_compute_kernel(float* data, int N, int iteration);
+
 // Sophisticated bidirectional transfer patterns
 class BidirectionalTransferManager {
 private:
@@ -1810,6 +1887,18 @@ CUDA events serve as lightweight synchronization primitives that can be recorded
 
 #### **Comprehensive Event Management:**
 ```cpp
+#include <vector>
+#include <string>
+#include <map>
+#include <queue>
+#include <chrono>
+#include <thread>
+#include <cstdio>
+#include <cmath>
+
+// Forward declaration
+__global__ void event_demo_kernel(float* data, int N, int kernel_id);
+
 // Advanced event management system for complex applications
 class EventManager {
 private:
@@ -2155,6 +2244,18 @@ Events provide the most accurate method for measuring GPU execution times, with 
 
 #### **Advanced Timing Infrastructure:**
 ```cpp
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <functional>
+#include <cmath>
+#include <cstdio>
+
+// Forward declarations
+__global__ void complex_math_kernel(float* input, float* output, int N);
+__global__ void simple_math_kernel(float* input, float* output, int N);
+
 // Sophisticated timing system using CUDA events
 class PerformanceProfiler {
 private:
@@ -2492,6 +2593,22 @@ Events enable sophisticated synchronization patterns beyond basic stream coordin
 
 #### **Event-Based Coordination Patterns:**
 ```cpp
+#include <string>
+#include <vector>
+#include <map>
+#include <queue>
+#include <functional>
+#include <thread>
+#include <chrono>
+#include <cstdio>
+#include <algorithm>
+
+// Forward declarations
+__global__ void initialization_kernel(float* data, int N);
+__global__ void combine_kernel(float* data1, float* data2, float* output, int N);
+__global__ void complex_math_kernel(float* input, float* output, int N);
+__global__ void simple_math_kernel(float* input, float* output, int N);
+
 // Complex event-driven coordination system
 class EventCoordinator {
 private:
@@ -2804,6 +2921,17 @@ CUDA Graphs capture sequences of GPU operations into a static directed acyclic g
 
 #### **Comprehensive Graph Management System:**
 ```cpp
+#include <string>
+#include <map>
+#include <vector>
+#include <chrono>
+#include <cstdio>
+#include <cmath>
+
+// Forward declarations
+__global__ void graph_stage1_kernel(float* input, float* output, int N);
+__global__ void graph_stage2_kernel(float* input, float* output, int N);
+
 // Advanced CUDA Graph management for production applications
 class GraphManager {
 private:
@@ -3280,6 +3408,23 @@ __global__ void graph_stage2_kernel(float* input, float* output, int N) {
 
 #### **Dynamic Graph Updates and Parameter Modification:**
 ```cpp
+#include <string>
+#include <vector>
+#include <map>
+#include <cstdio>
+#include <cmath>
+#include <limits>
+#include <algorithm>
+
+// Forward declarations
+__global__ void parameterized_kernel(float* input, float* output, int N, float scale);
+__global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id);
+__global__ void combine_results_kernel(float* input1, float* input2, float* output, int N);
+__global__ void preprocessing_kernel(float* input, float* output, int N);
+__global__ void optimized_kernel(float* input, float* output, int N);
+__global__ void standard_kernel(float* input, float* output, int N);
+__global__ void postprocessing_kernel(float* input, float* output, int N);
+
 // Advanced graph patterns for production workloads
 class AdvancedGraphPatterns {
 private:
@@ -3611,6 +3756,17 @@ __global__ void postprocessing_kernel(float* input, float* output, int N) {
 
 #### **Enterprise-Grade Graph Management:**
 ```cpp
+#include <map>
+#include <vector>
+#include <string>
+#include <cstdio>
+#include <limits>
+#include <algorithm>
+#include <cmath>
+
+// Forward declaration
+__global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id);
+
 // Production-ready graph optimization and management
 class ProductionGraphOptimizer {
 private:
@@ -3932,6 +4088,17 @@ Producer-consumer patterns enable efficient data flow management where different
 
 #### **Multi-Buffer Producer-Consumer System:**
 ```cpp
+#include <vector>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include <cstdio>
+
+// Forward declarations
+__global__ void producer_kernel(float* output, int N, int item_id);
+__global__ void consumer_kernel(float* input, int N, int sequence);
+
 // Advanced producer-consumer pattern with dynamic buffering
 template<typename T>
 class StreamProducerConsumer {
@@ -4294,6 +4461,17 @@ Stream-based pipelines enable complex multi-stage processing where each stage ca
 
 #### **Multi-Stage Processing Pipeline:**
 ```cpp
+#include <vector>
+#include <string>
+#include <functional>
+#include <cstdio>
+
+// Forward declarations
+__global__ void pipeline_preprocess_kernel(float* input, float* output, int N);
+__global__ void pipeline_compute_kernel(float* input, float* output, int N);
+__global__ void pipeline_postprocess_kernel(float* input, float* output, int N);
+__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id);
+
 // Sophisticated multi-stage pipeline with dynamic load balancing
 class StreamPipeline {
 private:
@@ -4749,6 +4927,26 @@ Advanced stream patterns can dynamically distribute work across multiple streams
 
 #### **Adaptive Stream Load Balancer:**
 ```cpp
+#include <vector>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <atomic>
+#include <chrono>
+#include <thread>
+#include <functional>
+#include <string>
+#include <limits>
+#include <numeric>
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+
+// Forward declarations
+__global__ void light_compute_kernel(int task_id);
+__global__ void medium_compute_kernel(int task_id);
+__global__ void heavy_compute_kernel(int task_id);
+
 // Dynamic load balancing across multiple streams
 class AdaptiveStreamBalancer {
 private:
