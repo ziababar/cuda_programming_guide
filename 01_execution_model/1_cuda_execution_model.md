@@ -210,7 +210,7 @@ if (sharedMemSize > prop.sharedMemPerBlock) {
 **Symptom:** High DRAM bandwidth usage but low effective throughput.
 **Quick Fixes:**
 - Ensure `threadIdx.x` reads/writes consecutive addresses (`data[base + threadIdx.x]`).
-- Avoid Structure-of-Arrays (SoA) to Array-of-Structures (AoS) conversion in kernel if possible, or use shared memory to realign.
+- Prefer Structure-of-Arrays (SoA) over Array-of-Structures (AoS); avoid AoS or conversions to AoS in the kernel if possible, or use shared memory to realign.
 
 ##  **Profiling Quick Commands**
 
