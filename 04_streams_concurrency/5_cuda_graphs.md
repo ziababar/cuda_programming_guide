@@ -2,19 +2,19 @@
 
 CUDA Graphs represent a paradigm shift from dynamic kernel launches to static execution graphs, enabling dramatic performance improvements for repetitive workloads by reducing launch overhead and enabling advanced optimizations.
 
-**[Back to Index](../README.md)** | **Previous: [Event-Driven Programming](4_event_driven_programming.md)** | **Next: [Advanced Stream Patterns](6_advanced_patterns.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Stream Fundamentals](1_stream_fundamentals.md)**
 
 ---
 
-## **Graph Fundamentals and Architecture**
+## Graph Fundamentals and Architecture
 
 CUDA Graphs capture sequences of GPU operations into a static directed acyclic graph (DAG), allowing the CUDA runtime to optimize execution and minimize overhead.
 
-**Source Code**: [`GraphManager.h`](../../src/04_streams_concurrency/GraphManager.h)
+### Comprehensive Graph Management System
+
+**Source Code**: [`../src/04_streams_concurrency/graph_manager.h`](../src/04_streams_concurrency/graph_manager.h)
 
 ```cpp
-#include "../src/04_streams_concurrency/GraphManager.h"
-
 // Demonstrate basic graph creation and execution
 void demonstrate_basic_graph_operations() {
     printf("=== Basic Graph Operations Demo ===\n");
@@ -132,18 +132,111 @@ __global__ void graph_stage2_kernel(float* input, float* output, int N) {
 }
 ```
 
-## **Advanced Graph Patterns and Optimization**
+## Advanced Graph Patterns and Optimization
 
-**Source Code**: [`AdvancedGraphPatterns.h`](../../src/04_streams_concurrency/AdvancedGraphPatterns.h)
+### Dynamic Graph Updates and Parameter Modification
 
 ```cpp
-#include "../src/04_streams_concurrency/AdvancedGraphPatterns.h"
+// Full implementation available in ../src/04_streams_concurrency/advanced_graph_patterns.cuh
+#include "../src/04_streams_concurrency/advanced_graph_patterns.cuh"
+
+// Kernel implementations for graph patterns
+__global__ void parameterized_kernel(float* input, float* output, int N, float scale) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = input[tid] * scale + sin(tid * 0.001f);
+    }
+}
+
+__global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        float value = input[tid];
+
+        // Different processing per branch
+        if (branch_id == 1) {
+            value = sqrt(fabs(value)) + cos(value);
+        } else {
+            value = sin(value) + log(fabs(value) + 1.0f);
+        }
+
+        output[tid] = value;
+    }
+}
+
+__global__ void combine_results_kernel(float* input1, float* input2, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = (input1[tid] + input2[tid]) * 0.5f;
+    }
+}
+
+__global__ void preprocessing_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = input[tid] * 2.0f + 1.0f;
+    }
+}
+
+__global__ void optimized_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Optimized computation (fewer operations)
+        output[tid] = input[tid] + 0.5f;
+    }
+}
+
+__global__ void standard_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Standard computation (more operations)
+        float value = input[tid];
+        for (int i = 0; i < 10; i++) {
+            value = sin(value) + cos(value * 0.1f);
+        }
+        output[tid] = value;
+    }
+}
+
+__global__ void postprocessing_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = sqrt(fabs(input[tid]));
+    }
+}
 ```
 
-## **Production Graph Optimization Strategies**
+## Production Graph Optimization Strategies
 
-**Source Code**: [`ProductionGraphOptimizer.h`](../../src/04_streams_concurrency/ProductionGraphOptimizer.h)
+### Enterprise-Grade Graph Management
 
 ```cpp
-#include "../src/04_streams_concurrency/ProductionGraphOptimizer.h"
+// Full implementation available in ../src/04_streams_concurrency/production_graph_optimizer.cuh
+#include "../src/04_streams_concurrency/production_graph_optimizer.cuh"
+
+__global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (tid < N) {
+        float value = input[tid];
+
+        // Different operations based on ID
+        switch (operation_id % 4) {
+            case 0:
+                value = sin(value) + 1.0f;
+                break;
+            case 1:
+                value = cos(value) + 2.0f;
+                break;
+            case 2:
+                value = sqrt(fabs(value)) + 3.0f;
+                break;
+            case 3:
+                value = log(fabs(value) + 1.0f) + 4.0f;
+                break;
+        }
+
+        output[tid] = value;
+    }
+}
 ```

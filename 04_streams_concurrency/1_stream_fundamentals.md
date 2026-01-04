@@ -2,13 +2,13 @@
 
 CUDA streams represent ordered sequences of GPU operations that execute asynchronously with respect to the host and other streams, enabling sophisticated concurrency patterns.
 
-**[Back to Index](../README.md)** | **Next: [Asynchronous Operations](2_asynchronous_operations.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../02_memory_hierarchy/1_cuda_memory_hierarchy.md)**
 
 ---
 
-##  **Stream Types and Properties**
+## Stream Types and Properties
 
-### **Stream Hierarchy and Characteristics**
+### Stream Hierarchy and Characteristics
 
 ```cpp
 // Comprehensive stream type demonstration
@@ -110,7 +110,7 @@ __global__ void simple_kernel(float* data, int N) {
 }
 ```
 
-### **Stream Execution Model**
+### Stream Execution Model
 
 ```cpp
 // Demonstrate FIFO ordering and inter-stream concurrency
@@ -188,20 +188,58 @@ void demonstrate_stream_execution_model() {
     cudaFree(d_data2);
     cudaFree(d_data3);
 }
+
+__global__ void preprocessing_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        data[tid] = sqrt(fabs(data[tid]));
+    }
+}
+
+__global__ void processing_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        data[tid] = sin(data[tid]) + cos(data[tid]);
+    }
+}
+
+__global__ void compute_intensive_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        float value = data[tid];
+        // Intensive computation
+        for (int i = 0; i < 100; i++) {
+            value = sin(value) + cos(value);
+        }
+        data[tid] = value;
+    }
+}
+
+__global__ void postprocessing_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        data[tid] = data[tid] * 2.0f + 1.0f;
+    }
+}
+
+__global__ void initialization_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        data[tid] = tid * 0.01f;
+    }
+}
 ```
 
-### **Stream Management Patterns**
+## Stream Management Patterns
 
-#### **Advanced Stream Management**
+### Advanced Stream Management
 
-We use a `StreamManager` class to handle priority streams and workload assignment.
+For sophisticated stream management, we can use a `StreamManager` class.
 
-**Source Code**: [`StreamManager.h`](../../src/04_streams_concurrency/StreamManager.h)
+**Source Code**: [`../src/04_streams_concurrency/stream_manager.h`](../src/04_streams_concurrency/stream_manager.h)
 
 ```cpp
 // Usage example
-#include "../src/04_streams_concurrency/StreamManager.h"
-
 void demonstrate_stream_manager() {
     printf("=== Stream Manager Demo ===\n");
 
@@ -244,3 +282,16 @@ void demonstrate_stream_manager() {
     cudaFree(d_data4);
 }
 ```
+
+## Debugging Streams
+
+When working with streams, it is crucial to understand synchronization points and potential serialization.
+
+### Nsight Debugging Tips
+
+- Use **Nsight Systems** to visualize:
+  - Stream timelines
+  - Overlap of memcopy and kernels
+- Identify serialization caused by:
+  - Shared resources
+  - Host sync calls (`cudaDeviceSynchronize()`)

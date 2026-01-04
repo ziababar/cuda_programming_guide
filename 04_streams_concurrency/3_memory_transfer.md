@@ -2,19 +2,19 @@
 
 Memory transfer optimization is crucial for achieving peak performance in CUDA applications. Understanding the memory hierarchy, transfer patterns, and bandwidth utilization strategies can significantly impact overall application throughput.
 
-**[Back to Index](../README.md)** | **Previous: [Asynchronous Operations](2_asynchronous_operations.md)** | **Next: [Event-Driven Programming](4_event_driven_programming.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Stream Fundamentals](1_stream_fundamentals.md)**
 
 ---
 
-## **Pinned Memory Deep Dive**
+## Pinned Memory Deep Dive
 
 Pinned (page-locked) memory is essential for achieving maximum memory transfer bandwidth and enabling true asynchronous operations.
 
-**Source Code**: [`PinnedMemoryManager.h`](../../src/04_streams_concurrency/PinnedMemoryManager.h)
+### Pinned Memory Management
+
+**Source Code**: [`../src/04_streams_concurrency/pinned_memory_manager.h`](../src/04_streams_concurrency/pinned_memory_manager.h)
 
 ```cpp
-#include "../src/04_streams_concurrency/PinnedMemoryManager.h"
-
 // Demonstrate different pinned memory allocation types
 void demonstrate_pinned_memory_types() {
     printf("=== Pinned Memory Types Comparison ===\n");
@@ -133,20 +133,36 @@ __global__ void zero_copy_kernel(float* data, int N) {
 }
 ```
 
-## **Bandwidth Optimization Strategies**
+## Bandwidth Optimization Strategies
 
-**Source Code**: [`BandwidthOptimizer.h`](../../src/04_streams_concurrency/BandwidthOptimizer.h)
+### Memory Transfer Pattern Analysis
 
 ```cpp
-#include "../src/04_streams_concurrency/BandwidthOptimizer.h"
+// Comprehensive bandwidth optimization techniques
+// Full implementation available in ../src/04_streams_concurrency/bandwidth_optimizer.cuh
+#include "../src/04_streams_concurrency/bandwidth_optimizer.cuh"
 ```
 
-## **Advanced Transfer Patterns**
+## Advanced Transfer Patterns
 
-### **Bidirectional Transfer Optimization**
-
-**Source Code**: [`BidirectionalTransferManager.h`](../../src/04_streams_concurrency/BidirectionalTransferManager.h)
+### Bidirectional Transfer Optimization
 
 ```cpp
-#include "../src/04_streams_concurrency/BidirectionalTransferManager.h"
+// Full implementation available in ../src/04_streams_concurrency/bidirectional_transfer_manager.cuh
+#include "../src/04_streams_concurrency/bidirectional_transfer_manager.cuh"
+
+__global__ void bidirectional_compute_kernel(float* data, int N, int iteration) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (tid < N) {
+        float value = data[tid];
+
+        // Different computation per iteration
+        for (int i = 0; i < (iteration + 1) * 50; i++) {
+            value = sin(value) + cos(value * 0.1f);
+        }
+
+        data[tid] = value;
+    }
+}
 ```

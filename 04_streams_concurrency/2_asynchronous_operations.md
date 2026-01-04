@@ -2,15 +2,15 @@
 
 Asynchronous execution is the cornerstone of high-performance GPU programming, enabling overlapped computation, memory transfer concurrency, and sophisticated pipeline orchestration.
 
-**[Back to Index](../README.md)** | **Previous: [Stream Fundamentals](1_stream_fundamentals.md)** | **Next: [Memory Transfer Optimization](3_memory_transfer.md)**
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Stream Fundamentals](1_stream_fundamentals.md)**
 
 ---
 
-## **Compute-Transfer Overlap**
+## Compute-Transfer Overlap
 
 The ability to overlap computation with memory transfers is one of the most powerful features of CUDA streams, often yielding 2-4x throughput improvements.
 
-### **Basic Overlap Patterns**
+### Basic Overlap Patterns
 
 ```cpp
 // Comprehensive compute-transfer overlap demonstration
@@ -130,7 +130,7 @@ __global__ void complex_processing_kernel(float* input, float* output, int N) {
 }
 ```
 
-### **Advanced Pipeline Processing**
+### Advanced Pipeline Processing
 
 ```cpp
 // Sophisticated pipeline with multiple processing stages
@@ -222,12 +222,91 @@ __global__ void stage2_kernel(float* input, float* output, int N) {
 }
 ```
 
-## **Dynamic Stream Management**
+### Stream Synchronization Mechanisms
 
-We use `AdaptiveStreamManager` for handling varying workloads dynamically.
-
-**Source Code**: [`AdaptiveStreamManager.h`](../../src/04_streams_concurrency/AdaptiveStreamManager.h)
+#### Comprehensive Synchronization Patterns
 
 ```cpp
-#include "../src/04_streams_concurrency/AdaptiveStreamManager.h"
+// Advanced synchronization techniques for complex workflows
+// Full implementation available in ../src/04_streams_concurrency/stream_synchronizer.cuh
+#include "../src/04_streams_concurrency/stream_synchronizer.cuh"
+
+// Kernel implementations for synchronization demo
+__global__ void parallel_work_kernel(int stream_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Simulate different amounts of work per stream
+    for (int i = 0; i < (stream_id + 1) * 100; i++) {
+        float dummy = sin(tid * 0.01f + i);
+    }
+
+    if (tid == 0) {
+        printf("Stream %d parallel work complete\n", stream_id);
+    }
+}
+
+__global__ void join_work_kernel() {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Work that depends on all parallel streams completing
+    float result = cos(tid * 0.01f);
+
+    if (tid == 0) {
+        printf("Join work complete\n");
+    }
+}
+
+__global__ void pipeline_stage_kernel(int stage, int iteration) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Stage-specific processing
+    float result = sin(tid * stage * iteration * 0.001f);
+
+    if (tid == 0) {
+        printf("Stage %d, iteration %d complete\n", stage, iteration);
+    }
+}
+
+__global__ void initial_processing_kernel() {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Initial data processing
+    float result = tid * 0.01f;
+
+    if (tid == 0) {
+        printf("Initial processing complete\n");
+    }
+}
+
+__global__ void parallel_processing_kernel(int branch_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Branch-specific processing
+    float result = sin(tid * branch_id * 0.01f);
+
+    if (tid == 0) {
+        printf("Parallel processing branch %d complete\n", branch_id);
+    }
+}
+
+__global__ void aggregation_kernel() {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Final aggregation
+    float result = cos(tid * 0.01f);
+
+    if (tid == 0) {
+        printf("Aggregation complete\n");
+    }
+}
+```
+
+## Dynamic Stream Management
+
+### Adaptive Stream Allocation
+
+```cpp
+// Dynamic stream management for varying workloads
+// Full implementation available in ../src/04_streams_concurrency/adaptive_stream_manager.cuh
+#include "../src/04_streams_concurrency/adaptive_stream_manager.cuh"
 ```
