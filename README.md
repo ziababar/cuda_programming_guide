@@ -33,7 +33,13 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Advanced Patterns](03_synchronization/8_advanced_synchronization.md)** - Wave and pipeline synchronization
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
-- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Advanced patterns and optimization
+- **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Index and advanced patterns
+- **[Stream Fundamentals](04_streams_concurrency/1_stream_fundamentals.md)** - Stream types, properties, and debugging
+- **[Asynchronous Operations](04_streams_concurrency/2_asynchronous_operations.md)** - Overlap, pipelines, and synchronization
+- **[Memory Transfer Optimization](04_streams_concurrency/3_memory_transfer.md)** - Pinned memory and bandwidth
+- **[Event-Driven Programming](04_streams_concurrency/4_event_driven_programming.md)** - Events, timing, and coordination
+- **[CUDA Graphs Deep Dive](04_streams_concurrency/5_cuda_graphs.md)** - Graphs, updates, and optimization
+- **[Advanced Stream Patterns](04_streams_concurrency/6_advanced_patterns.md)** - Producers, pipelines, and load balancing
 
 ### Performance & Profiling - [`05_performance_profiling/`](05_performance_profiling/)
 - **[Profiling Overview](05_performance_profiling/1_profiling_overview.md)** - Key tools and concepts
