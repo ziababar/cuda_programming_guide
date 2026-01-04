@@ -1,13 +1,19 @@
-#ifndef STREAM_PRODUCER_CONSUMER_H
-#define STREAM_PRODUCER_CONSUMER_H
-
+#pragma once
+#include <cuda_runtime.h>
 #include <vector>
 #include <queue>
+#include <cstdio>
 #include <mutex>
 #include <condition_variable>
+#include <thread>
 #include <atomic>
-#include <cstdio>
-#include <cuda_runtime.h>
+#include <chrono>
+
+// Forward declarations for kernels
+template<typename T>
+__global__ void producer_kernel(T* output, int N, int item_id);
+template<typename T>
+__global__ void consumer_kernel(T* input, int N, int sequence);
 
 // Advanced producer-consumer pattern with dynamic buffering
 template<typename T>
@@ -250,4 +256,28 @@ public:
     }
 };
 
-#endif // STREAM_PRODUCER_CONSUMER_H
+template<typename T>
+__global__ void producer_kernel(T* output, int N, int item_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = item_id + tid * 0.001f;
+    }
+
+    if (tid == 0) {
+        printf("GPU Producer: Generated item %d\n", item_id);
+    }
+}
+
+template<typename T>
+__global__ void consumer_kernel(T* input, int N, int sequence) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        float value = input[tid];
+        // Simulate processing
+        input[tid] = value * 2.0f + 1.0f;
+    }
+
+    if (tid == 0) {
+        printf("GPU Consumer: Processed sequence %d\n", sequence);
+    }
+}

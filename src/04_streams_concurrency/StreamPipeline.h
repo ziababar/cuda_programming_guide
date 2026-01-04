@@ -1,11 +1,15 @@
-#ifndef STREAM_PIPELINE_H
-#define STREAM_PIPELINE_H
-
+#pragma once
+#include <cuda_runtime.h>
 #include <vector>
 #include <string>
-#include <functional>
 #include <cstdio>
-#include <cuda_runtime.h>
+#include <functional>
+
+// Forward declarations for kernels
+__global__ void pipeline_preprocess_kernel(float* input, float* output, int N);
+__global__ void pipeline_compute_kernel(float* input, float* output, int N);
+__global__ void pipeline_postprocess_kernel(float* input, float* output, int N);
+__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id);
 
 // Sophisticated multi-stage pipeline with dynamic load balancing
 class StreamPipeline {
@@ -63,8 +67,7 @@ public:
                    stage.name.c_str(), stage.input_buffer, stage.output_buffer);
         }
 
-        // Setup default functions must be done outside or via setter in this extracted version
-        // to avoid dependency on specific kernels
+        setup_default_processing_functions();
         is_initialized = true;
 
         printf("StreamPipeline initialization complete\n");
@@ -128,10 +131,8 @@ public:
             }
 
             // Execute stage processing
-            if (stage.process_func) {
-                stage.process_func(stage.input_buffer, stage.output_buffer,
-                                 stage.buffer_size, stage.stream);
-            }
+            stage.process_func(stage.input_buffer, stage.output_buffer,
+                             stage.buffer_size, stage.stream);
 
             // Record completion event
             cudaEventRecord(stage.stage_complete, stage.stream);
@@ -216,10 +217,8 @@ public:
                 }
 
                 // Execute processing
-                if (stage.process_func) {
-                    stage.process_func(stage.input_buffer, stage.output_buffer,
-                                     stage.buffer_size, stage.stream);
-                }
+                stage.process_func(stage.input_buffer, stage.output_buffer,
+                                 stage.buffer_size, stage.stream);
 
                 // Record completion
                 cudaEventRecord(stage.stage_complete, stage.stream);
@@ -321,6 +320,34 @@ public:
     }
 
 private:
+    void setup_default_processing_functions() {
+        // Stage 0: Data preprocessing
+        set_stage_processor(0, [](float* input, float* output, int N, cudaStream_t stream) {
+            pipeline_preprocess_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
+        }, "Preprocessing");
+
+        // Stage 1: Main computation
+        if (num_stages > 1) {
+            set_stage_processor(1, [](float* input, float* output, int N, cudaStream_t stream) {
+                pipeline_compute_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
+            }, "MainCompute");
+        }
+
+        // Stage 2: Post-processing
+        if (num_stages > 2) {
+            set_stage_processor(2, [](float* input, float* output, int N, cudaStream_t stream) {
+                pipeline_postprocess_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
+            }, "Postprocessing");
+        }
+
+        // Additional stages get generic processing
+        for (int i = 3; i < num_stages; i++) {
+            set_stage_processor(i, [i](float* input, float* output, int N, cudaStream_t stream) {
+                pipeline_generic_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N, i);
+            }, "GenericStage_" + std::to_string(i));
+        }
+    }
+
     float get_total_pipeline_time() {
         float total = 0.0f;
         for (const auto& stage : stages) {
@@ -348,4 +375,39 @@ public:
     }
 };
 
-#endif // STREAM_PIPELINE_H
+__global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Normalization and basic preprocessing
+        output[tid] = (input[tid] - 128.0f) / 255.0f;
+    }
+}
+
+__global__ void pipeline_compute_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Main computation - complex mathematical operations
+        float value = input[tid];
+        for (int i = 0; i < 10; i++) {
+            value = sin(value) + cos(value * 0.5f);
+        }
+        output[tid] = value;
+    }
+}
+
+__global__ void pipeline_postprocess_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Post-processing - scaling and clamping
+        float value = input[tid] * 255.0f + 128.0f;
+        output[tid] = fmaxf(0.0f, fminf(255.0f, value));
+    }
+}
+
+__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Generic processing based on stage ID
+        output[tid] = input[tid] * (stage_id + 1) + 0.1f;
+    }
+}

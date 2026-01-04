@@ -1,20 +1,21 @@
-#ifndef ADAPTIVE_STREAM_BALANCER_H
-#define ADAPTIVE_STREAM_BALANCER_H
-
+#pragma once
+#include <cuda_runtime.h>
 #include <vector>
 #include <string>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-#include <atomic>
-#include <functional>
 #include <thread>
+#include <atomic>
 #include <chrono>
 #include <numeric>
-#include <algorithm>
 #include <cstdio>
-#include <cmath>
-#include <cuda_runtime.h>
+#include <algorithm>
+
+// Forward declarations for kernels
+__global__ void light_compute_kernel(int task_id);
+__global__ void medium_compute_kernel(int task_id);
+__global__ void heavy_compute_kernel(int task_id);
 
 // Dynamic load balancing across multiple streams
 class AdaptiveStreamBalancer {
@@ -382,4 +383,46 @@ public:
     }
 };
 
-#endif // ADAPTIVE_STREAM_BALANCER_H
+// Load balancing kernel implementations
+__global__ void light_compute_kernel(int task_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Light computation
+    float result = 0.0f;
+    for (int i = 0; i < 100; i++) {
+        result += sin(tid * 0.001f + i);
+    }
+
+    if (tid == 0) {
+        printf("Light task %d completed (result: %.3f)\n", task_id, result);
+    }
+}
+
+__global__ void medium_compute_kernel(int task_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Medium computation
+    float result = 0.0f;
+    for (int i = 0; i < 1000; i++) {
+        result += sin(tid * 0.001f + i) * cos(tid * 0.002f + i);
+    }
+
+    if (tid == 0) {
+        printf("Medium task %d completed (result: %.3f)\n", task_id, result);
+    }
+}
+
+__global__ void heavy_compute_kernel(int task_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Heavy computation
+    float result = 0.0f;
+    for (int i = 0; i < 10000; i++) {
+        result += sin(tid * 0.001f + i) * cos(tid * 0.002f + i) *
+                 log(fabs(tid * 0.003f + i) + 1.0f);
+    }
+
+    if (tid == 0) {
+        printf("Heavy task %d completed (result: %.3f)\n", task_id, result);
+    }
+}

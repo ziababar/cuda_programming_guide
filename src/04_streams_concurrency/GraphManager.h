@@ -1,13 +1,12 @@
-#ifndef GRAPH_MANAGER_H
-#define GRAPH_MANAGER_H
-
+#pragma once
+#include <cuda_runtime.h>
+#include <vector>
 #include <string>
 #include <map>
-#include <vector>
 #include <chrono>
 #include <cstdio>
-#include <cuda_runtime.h>
 
+// Advanced CUDA Graph management for production applications
 class GraphManager {
 private:
     struct GraphInfo {
@@ -361,5 +360,3 @@ public:
         printf("GraphManager cleanup complete\n");
     }
 };
-
-#endif // GRAPH_MANAGER_H

@@ -1,15 +1,20 @@
-#  Advanced Stream Patterns
+# Advanced Stream Patterns
 
 Beyond basic stream operations, CUDA enables sophisticated coordination patterns that maximize GPU utilization through complex producer-consumer relationships, pipeline architectures, and dynamic load balancing strategies.
 
-##  Producer-Consumer Patterns
+**[Back to Index](../README.md)** | **Previous: [CUDA Graphs](5_cuda_graphs.md)**
+
+---
+
+## **Producer-Consumer Patterns**
 
 Producer-consumer patterns enable efficient data flow management where different components generate and consume data at potentially different rates, requiring sophisticated buffering and synchronization strategies.
 
-###  Multi-Buffer Producer-Consumer System
-See [StreamProducerConsumer.h](../src/04_streams_concurrency/StreamProducerConsumer.h) for the full implementation of the `StreamProducerConsumer` class.
+**Source Code**: [`StreamProducerConsumer.h`](../../src/04_streams_concurrency/StreamProducerConsumer.h)
 
 ```cpp
+#include "../src/04_streams_concurrency/StreamProducerConsumer.h"
+
 // Producer function for demonstration
 template<typename T>
 void producer_worker(StreamProducerConsumer<T>& system, int num_items) {
@@ -92,150 +97,27 @@ void demonstrate_producer_consumer_pattern() {
     // Final statistics
     system.print_statistics();
 }
-
-__global__ void producer_kernel(float* output, int N, int item_id) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        output[tid] = item_id + tid * 0.001f;
-    }
-
-    if (tid == 0) {
-        printf("GPU Producer: Generated item %d\n", item_id);
-    }
-}
-
-__global__ void consumer_kernel(float* input, int N, int sequence) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        float value = input[tid];
-        // Simulate processing
-        input[tid] = value * 2.0f + 1.0f;
-    }
-
-    if (tid == 0) {
-        printf("GPU Consumer: Processed sequence %d\n", sequence);
-    }
-}
 ```
 
-##  Pipeline Architecture Patterns
+## **Pipeline Architecture Patterns**
 
 Stream-based pipelines enable complex multi-stage processing where each stage can operate independently and concurrently, maximizing GPU utilization and throughput.
 
-###  Multi-Stage Processing Pipeline
-See [StreamPipeline.h](../src/04_streams_concurrency/StreamPipeline.h) for the full implementation of the `StreamPipeline` class.
+**Source Code**: [`StreamPipeline.h`](../../src/04_streams_concurrency/StreamPipeline.h)
 
 ```cpp
-// Demonstrate advanced pipeline patterns
-void demonstrate_pipeline_patterns() {
-    printf("=== Pipeline Patterns Demonstration ===\n");
-
-    const int buffer_size = 1024 * 1024; // 1M elements
-    const int num_batches = 5;
-
-    // Create pipeline with 4 stages
-    StreamPipeline pipeline(4, buffer_size);
-
-    // Configure pipeline stages with specific kernels
-    pipeline.set_stage_processor(0, [](float* input, float* output, int N, cudaStream_t stream) {
-        pipeline_preprocess_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
-    }, "Preprocessing");
-
-    pipeline.set_stage_processor(1, [](float* input, float* output, int N, cudaStream_t stream) {
-        pipeline_compute_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
-    }, "MainCompute");
-
-    pipeline.set_stage_processor(2, [](float* input, float* output, int N, cudaStream_t stream) {
-        pipeline_postprocess_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N);
-    }, "Postprocessing");
-
-    pipeline.set_stage_processor(3, [](float* input, float* output, int N, cudaStream_t stream) {
-        pipeline_generic_kernel<<<(N+255)/256, 256, 0, stream>>>(input, output, N, 3);
-    }, "Finalize");
-
-    // Prepare test data
-    std::vector<float*> input_batches(num_batches);
-    std::vector<float*> output_batches(num_batches);
-
-    for (int i = 0; i < num_batches; i++) {
-        input_batches[i] = new float[buffer_size];
-        output_batches[i] = new float[buffer_size];
-
-        // Initialize input data
-        for (int j = 0; j < buffer_size; j++) {
-            input_batches[i][j] = i * 1000.0f + j * 0.001f;
-        }
-    }
-
-    printf("\n1. Single Pipeline Execution:\n");
-    pipeline.execute_pipeline(input_batches[0], output_batches[0], true);
-
-    printf("\n2. Sequential Batch Processing:\n");
-    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
-                                    num_batches, false);
-
-    printf("\n3. Overlapped Batch Processing:\n");
-    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
-                                    num_batches, true);
-
-    printf("\n4. Pipeline Analysis:\n");
-    pipeline.print_pipeline_statistics();
-    pipeline.analyze_pipeline_bottlenecks();
-
-    // Cleanup
-    for (int i = 0; i < num_batches; i++) {
-        delete[] input_batches[i];
-        delete[] output_batches[i];
-    }
-}
-
-// Pipeline kernel implementations
-__global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        // Normalization and basic preprocessing
-        output[tid] = (input[tid] - 128.0f) / 255.0f;
-    }
-}
-
-__global__ void pipeline_compute_kernel(float* input, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        // Main computation - complex mathematical operations
-        float value = input[tid];
-        for (int i = 0; i < 10; i++) {
-            value = sin(value) + cos(value * 0.5f);
-        }
-        output[tid] = value;
-    }
-}
-
-__global__ void pipeline_postprocess_kernel(float* input, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        // Post-processing - scaling and clamping
-        float value = input[tid] * 255.0f + 128.0f;
-        output[tid] = fmaxf(0.0f, fminf(255.0f, value));
-    }
-}
-
-__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        // Generic processing based on stage ID
-        output[tid] = input[tid] * (stage_id + 1) + 0.1f;
-    }
-}
+#include "../src/04_streams_concurrency/StreamPipeline.h"
 ```
 
-##  Dynamic Load Balancing
+## **Dynamic Load Balancing**
 
 Advanced stream patterns can dynamically distribute work across multiple streams based on real-time performance characteristics and system load.
 
-###  Adaptive Stream Load Balancer
-See [AdaptiveStreamBalancer.h](../src/04_streams_concurrency/AdaptiveStreamBalancer.h) for the full implementation of the `AdaptiveStreamBalancer` class.
+**Source Code**: [`AdaptiveStreamBalancer.h`](../../src/04_streams_concurrency/AdaptiveStreamBalancer.h)
 
 ```cpp
+#include "../src/04_streams_concurrency/AdaptiveStreamBalancer.h"
+
 // Demonstrate adaptive load balancing
 void demonstrate_adaptive_load_balancing() {
     printf("=== Adaptive Load Balancing Demo ===\n");
@@ -286,69 +168,11 @@ void demonstrate_adaptive_load_balancing() {
     printf("\n4. Final Statistics:\n");
     balancer.print_comprehensive_statistics();
 }
-
-// Load balancing kernel implementations
-__global__ void light_compute_kernel(int task_id) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-
-    // Light computation
-    float result = 0.0f;
-    for (int i = 0; i < 100; i++) {
-        result += sin(tid * 0.001f + i);
-    }
-
-    if (tid == 0) {
-        printf("Light task %d completed (result: %.3f)\n", task_id, result);
-    }
-}
-
-__global__ void medium_compute_kernel(int task_id) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-
-    // Medium computation
-    float result = 0.0f;
-    for (int i = 0; i < 1000; i++) {
-        result += sin(tid * 0.001f + i) * cos(tid * 0.002f + i);
-    }
-
-    if (tid == 0) {
-        printf("Medium task %d completed (result: %.3f)\n", task_id, result);
-    }
-}
-
-__global__ void heavy_compute_kernel(int task_id) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-
-    // Heavy computation
-    float result = 0.0f;
-    for (int i = 0; i < 10000; i++) {
-        result += sin(tid * 0.001f + i) * cos(tid * 0.002f + i) *
-                 log(fabs(tid * 0.003f + i) + 1.0f);
-    }
-
-    if (tid == 0) {
-        printf("Heavy task %d completed (result: %.3f)\n", task_id, result);
-    }
-}
-
-// Comprehensive demonstration of advanced stream patterns
-void demonstrate_comprehensive_advanced_patterns() {
-    printf("=== Comprehensive Advanced Stream Patterns Demo ===\n");
-
-    printf("\n1. Producer-Consumer Pattern:\n");
-    demonstrate_producer_consumer_pattern();
-
-    printf("\n2. Pipeline Architecture:\n");
-    demonstrate_pipeline_patterns();
-
-    printf("\n3. Adaptive Load Balancing:\n");
-    demonstrate_adaptive_load_balancing();
-
-    printf("\nAdvanced stream patterns demonstration complete!\n");
-}
 ```
 
-##  Nsight Debugging Tips
+---
+
+## **Nsight Debugging Tips**
 
 - Use **Nsight Systems** to visualize:
   - Stream timelines

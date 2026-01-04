@@ -1,15 +1,11 @@
-#ifndef STREAM_MANAGER_H
-#define STREAM_MANAGER_H
-
+#pragma once
+#include <cuda_runtime.h>
 #include <vector>
 #include <string>
-#include <queue>
-#include <map>
-#include <algorithm>
-#include <chrono>
 #include <cstdio>
-#include <cuda_runtime.h>
+#include <algorithm>
 
+// Sophisticated stream management for production applications
 class StreamManager {
 private:
     std::vector<cudaStream_t> streams;
@@ -160,11 +156,9 @@ public:
         printf("=== Stream Performance Stats ===\n");
         // This would require more sophisticated tracking in a real implementation
         printf("Total streams: %d\n", num_streams);
-        if (!stream_priorities.empty()) {
-            printf("Priority range: %d to %d\n",
-                *std::min_element(stream_priorities.begin(), stream_priorities.end()),
-                *std::max_element(stream_priorities.begin(), stream_priorities.end()));
-        }
+        printf("Priority range: %d to %d\n",
+               *std::min_element(stream_priorities.begin(), stream_priorities.end()),
+               *std::max_element(stream_priorities.begin(), stream_priorities.end()));
         printf("Current allocation index: %d\n", current_stream_index);
         printf("===============================\n");
     }
@@ -181,5 +175,3 @@ public:
         printf("StreamManager cleanup complete\n");
     }
 };
-
-#endif // STREAM_MANAGER_H

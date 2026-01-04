@@ -1,13 +1,11 @@
-#ifndef ADAPTIVE_STREAM_MANAGER_H
-#define ADAPTIVE_STREAM_MANAGER_H
-
+#pragma once
+#include <cuda_runtime.h>
 #include <vector>
 #include <queue>
 #include <map>
 #include <chrono>
-#include <cstdio>
 #include <algorithm>
-#include <cuda_runtime.h>
+#include <cstdio>
 
 // Dynamic stream management for varying workloads
 class AdaptiveStreamManager {
@@ -204,5 +202,3 @@ public:
         printf("AdaptiveStreamManager destroyed\n");
     }
 };
-
-#endif // ADAPTIVE_STREAM_MANAGER_H

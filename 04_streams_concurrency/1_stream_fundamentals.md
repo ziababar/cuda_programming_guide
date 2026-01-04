@@ -1,10 +1,15 @@
-#  Stream Fundamentals
+# Stream Fundamentals
 
 CUDA streams represent ordered sequences of GPU operations that execute asynchronously with respect to the host and other streams, enabling sophisticated concurrency patterns.
 
-##  Stream Types and Properties
+**[Back to Index](../README.md)** | **Next: [Asynchronous Operations](2_asynchronous_operations.md)**
 
-###  Stream Hierarchy and Characteristics
+---
+
+##  **Stream Types and Properties**
+
+### **Stream Hierarchy and Characteristics**
+
 ```cpp
 // Comprehensive stream type demonstration
 void demonstrate_stream_fundamentals() {
@@ -105,7 +110,8 @@ __global__ void simple_kernel(float* data, int N) {
 }
 ```
 
-###  Stream Execution Model
+### **Stream Execution Model**
+
 ```cpp
 // Demonstrate FIFO ordering and inter-stream concurrency
 void demonstrate_stream_execution_model() {
@@ -182,55 +188,20 @@ void demonstrate_stream_execution_model() {
     cudaFree(d_data2);
     cudaFree(d_data3);
 }
-
-__global__ void preprocessing_kernel(float* data, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        data[tid] = sqrt(fabs(data[tid]));
-    }
-}
-
-__global__ void processing_kernel(float* data, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        data[tid] = sin(data[tid]) + cos(data[tid]);
-    }
-}
-
-__global__ void compute_intensive_kernel(float* data, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        float value = data[tid];
-        // Intensive computation
-        for (int i = 0; i < 100; i++) {
-            value = sin(value) + cos(value);
-        }
-        data[tid] = value;
-    }
-}
-
-__global__ void postprocessing_kernel(float* data, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        data[tid] = data[tid] * 2.0f + 1.0f;
-    }
-}
-
-__global__ void initialization_kernel(float* data, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) {
-        data[tid] = tid * 0.01f;
-    }
-}
 ```
 
-###  Stream Management Patterns
+### **Stream Management Patterns**
 
 #### **Advanced Stream Management**
-See [StreamManager.h](../src/04_streams_concurrency/StreamManager.h) for the full implementation of the `StreamManager` class.
+
+We use a `StreamManager` class to handle priority streams and workload assignment.
+
+**Source Code**: [`StreamManager.h`](../../src/04_streams_concurrency/StreamManager.h)
 
 ```cpp
 // Usage example
+#include "../src/04_streams_concurrency/StreamManager.h"
+
 void demonstrate_stream_manager() {
     printf("=== Stream Manager Demo ===\n");
 
