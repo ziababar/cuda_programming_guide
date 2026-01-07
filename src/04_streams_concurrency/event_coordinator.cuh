@@ -212,3 +212,22 @@ public:
         printf("EventCoordinator cleanup complete\n");
     }
 };
+<<<<<<< HEAD
+
+__global__ void initialization_kernel(float* data, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        data[tid] = tid * 0.001f;
+    }
+}
+
+__global__ void combine_kernel(float* data1, float* data2, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = (data1[tid] + data2[tid]) * 0.5f;
+    }
+}
+
+#endif // EVENT_COORDINATOR_CUH
+=======
+>>>>>>> main

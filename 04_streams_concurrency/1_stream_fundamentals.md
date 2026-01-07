@@ -45,6 +45,43 @@ void demonstrate_stream_fundamentals() {
     cudaStreamCreate(&stream1);
     cudaStreamCreate(&stream2);
 
+<<<<<<< HEAD
+    // Operations in different streams can overlap
+    cudaMemsetAsync(d_data1, 0, size, stream1);
+    cudaMemsetAsync(d_data2, 1, size, stream2);
+
+    // ... cleanup ...
+}
+```
+
+### Stream Execution Model
+
+Streams follow a strict FIFO (First-In-First-Out) ordering for operations within the same stream. However, operations in different streams can execute concurrently, limited only by hardware resources and dependencies.
+
+- **Intra-Stream**: Sequential execution.
+- **Inter-Stream**: Concurrent execution (where possible).
+
+For a complete demonstration of the stream execution model, including concurrent kernel execution and memory transfers, refer to the source code examples.
+
+## Stream Management Patterns
+
+Managing a large number of streams efficiently is crucial for complex applications. A `StreamManager` class can help handle stream creation, reuse, and priority management.
+
+### Advanced Stream Management
+
+A `StreamManager` typically handles:
+- **Pooling**: reusing streams to avoid creation/destruction overhead.
+- **Prioritization**: managing streams with different priorities (e.g., High, Low).
+- **Load Balancing**: assigning work to available streams.
+
+> **Note**: A comprehensive `StreamManager` implementation is provided in [`src/04_streams_concurrency/stream_manager.cuh`](../src/04_streams_concurrency/stream_manager.cuh). It includes features like round-robin allocation, availability checking, and priority-based selection.
+
+```cpp
+// Usage example of StreamManager
+#include "../src/04_streams_concurrency/stream_manager.cuh"
+
+void demonstrate_stream_manager() {
+=======
     // These can execute concurrently
     // cudaMemsetAsync(d_data1, 0, size, stream1);
     // simple_kernel<<<256, 256, 0, stream1>>>(d_data1, 1024);
@@ -80,14 +117,21 @@ The `StreamManager` class provides:
 void demonstrate_stream_manager() {
     printf("=== Stream Manager Demo ===\n");
 
+>>>>>>> main
     // Create manager with priority streams and custom tags
     std::vector<std::string> tags = {"MemoryOps", "Compute", "HighPrio", "Background"};
     StreamManager manager(4, true, tags);
 
     // Assign workloads to appropriate streams
+<<<<<<< HEAD
+    cudaStream_t compute_stream = manager.get_stream_for_workload("compute_intensive");
+
+    // Launch operations
+=======
     cudaStream_t memory_stream = manager.get_stream_for_workload("memory_intensive");
     cudaStream_t compute_stream = manager.get_stream_for_workload("compute_intensive");
 
+>>>>>>> main
     // ...
 }
 ```

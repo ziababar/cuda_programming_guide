@@ -202,3 +202,8 @@ public:
         printf("AdaptiveStreamManager destroyed\n");
     }
 };
+<<<<<<< HEAD
+
+#endif // ADAPTIVE_STREAM_MANAGER_CUH
+=======
+>>>>>>> main

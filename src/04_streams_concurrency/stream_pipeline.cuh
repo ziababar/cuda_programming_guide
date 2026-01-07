@@ -376,3 +376,92 @@ public:
         printf("StreamPipeline cleanup complete\n");
     }
 };
+<<<<<<< HEAD
+
+__global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Normalization and basic preprocessing
+        output[tid] = (input[tid] - 128.0f) / 255.0f;
+    }
+}
+
+__global__ void pipeline_compute_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Main computation - complex mathematical operations
+        float value = input[tid];
+        for (int i = 0; i < 10; i++) {
+            value = sin(value) + cos(value * 0.5f);
+        }
+        output[tid] = value;
+    }
+}
+
+__global__ void pipeline_postprocess_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Post-processing - scaling and clamping
+        float value = input[tid] * 255.0f + 128.0f;
+        output[tid] = fmaxf(0.0f, fminf(255.0f, value));
+    }
+}
+
+__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Generic processing based on stage ID
+        output[tid] = input[tid] * (stage_id + 1) + 0.1f;
+    }
+}
+
+// Demonstrate advanced pipeline patterns
+void demonstrate_pipeline_patterns() {
+    printf("=== Pipeline Patterns Demonstration ===\n");
+
+    const int buffer_size = 1024 * 1024; // 1M elements
+    const int num_batches = 5;
+
+    // Create pipeline with 4 stages
+    StreamPipeline pipeline(4, buffer_size);
+
+    // Prepare test data
+    std::vector<float*> input_batches(num_batches);
+    std::vector<float*> output_batches(num_batches);
+
+    for (int i = 0; i < num_batches; i++) {
+        // Use pinned memory for asynchronous transfers
+        cudaHostAlloc(&input_batches[i], buffer_size * sizeof(float), cudaHostAllocDefault);
+        cudaHostAlloc(&output_batches[i], buffer_size * sizeof(float), cudaHostAllocDefault);
+
+        // Initialize input data
+        for (int j = 0; j < buffer_size; j++) {
+            input_batches[i][j] = i * 1000.0f + j * 0.001f;
+        }
+    }
+
+    printf("\n1. Single Pipeline Execution:\n");
+    pipeline.execute_pipeline(input_batches[0], output_batches[0], true);
+
+    printf("\n2. Sequential Batch Processing:\n");
+    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
+                                    num_batches, false);
+
+    printf("\n3. Overlapped Batch Processing:\n");
+    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
+                                    num_batches, true);
+
+    printf("\n4. Pipeline Analysis:\n");
+    pipeline.print_pipeline_statistics();
+    pipeline.analyze_pipeline_bottlenecks();
+
+    // Cleanup
+    for (int i = 0; i < num_batches; i++) {
+        cudaFreeHost(input_batches[i]);
+        cudaFreeHost(output_batches[i]);
+    }
+}
+
+#endif // STREAM_PIPELINE_CUH
+=======
+>>>>>>> main

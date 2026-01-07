@@ -217,3 +217,33 @@ public:
         printf("PerformanceProfiler cleanup complete\n");
     }
 };
+<<<<<<< HEAD
+
+__global__ void complex_math_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (tid < N) {
+        float value = input[tid];
+
+        // Complex mathematical operations
+        for (int i = 0; i < 50; i++) {
+            value = sin(value) + cos(value);
+            value = sqrt(fabs(value) + 1.0f);
+            value = log(value + 1.0f);
+        }
+
+        output[tid] = value;
+    }
+}
+
+__global__ void simple_math_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (tid < N) {
+        output[tid] = input[tid] * 2.0f + 1.0f;
+    }
+}
+
+#endif // PERFORMANCE_PROFILER_CUH
+=======
+>>>>>>> main

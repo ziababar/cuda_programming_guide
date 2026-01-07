@@ -65,6 +65,15 @@ void profile_code() {
 
 ## Advanced Synchronization Patterns
 
+<<<<<<< HEAD
+Events enable complex dependency graphs where streams wait on each other without host intervention.
+
+### Event Coordinator
+The `EventCoordinator` class ([`src/04_streams_concurrency/event_coordinator.cuh`](../src/04_streams_concurrency/event_coordinator.cuh)) demonstrates how to build and execute a dependency graph of tasks.
+- **Nodes**: Work units (kernels).
+- **Dependencies**: Events that must complete before a node starts.
+- **Execution**: The coordinator schedules nodes onto streams as their dependencies are satisfied.
+=======
 Events enable complex dependency graphs (DAGs) without using CUDA Graphs, which is useful for dynamic dependencies.
 
 ### EventCoordinator Implementation
@@ -87,3 +96,4 @@ void dependency_graph_demo() {
     coordinator.execute_graph();
 }
 ```
+>>>>>>> main

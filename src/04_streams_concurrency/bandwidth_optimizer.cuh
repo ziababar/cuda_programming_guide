@@ -169,3 +169,8 @@ private:
         return total_bandwidth;
     }
 };
+<<<<<<< HEAD
+
+#endif // BANDWIDTH_OPTIMIZER_CUH
+=======
+>>>>>>> main
