@@ -1,10 +1,8 @@
-#ifndef PINNED_MEMORY_MANAGER_CUH
-#define PINNED_MEMORY_MANAGER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
 #include <map>
-#include <cstdio>
 #include <vector>
+#include <cstdio>
 
 // Advanced pinned memory allocation and management
 class PinnedMemoryManager {
@@ -93,5 +91,8 @@ public:
                total_allocated / (1024.0 * 1024.0));
     }
 };
+<<<<<<< HEAD
 
 #endif // PINNED_MEMORY_MANAGER_CUH
+=======
+>>>>>>> main

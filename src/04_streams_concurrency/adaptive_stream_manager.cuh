@@ -1,6 +1,4 @@
-#ifndef ADAPTIVE_STREAM_MANAGER_CUH
-#define ADAPTIVE_STREAM_MANAGER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
 #include <vector>
 #include <queue>
@@ -204,5 +202,8 @@ public:
         printf("AdaptiveStreamManager destroyed\n");
     }
 };
+<<<<<<< HEAD
 
 #endif // ADAPTIVE_STREAM_MANAGER_CUH
+=======
+>>>>>>> main

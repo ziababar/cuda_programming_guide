@@ -1,11 +1,10 @@
-#ifndef STREAM_MANAGER_CUH
-#define STREAM_MANAGER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <cstdio>
+<<<<<<< HEAD
 #include <cmath>
 #include <map>
 #include <chrono>
@@ -15,6 +14,9 @@ __global__ void simple_kernel(float* data, int N);
 __global__ void preprocessing_kernel(float* data, int N);
 __global__ void processing_kernel(float* data, int N);
 __global__ void compute_intensive_kernel(float* data, int N);
+=======
+#include <map>
+>>>>>>> main
 
 // Sophisticated stream management for production applications
 class StreamManager {
@@ -186,6 +188,7 @@ public:
         printf("StreamManager cleanup complete\n");
     }
 };
+<<<<<<< HEAD
 
 // Comprehensive stream type demonstration
 void demonstrate_stream_fundamentals() {
@@ -355,3 +358,5 @@ __global__ void compute_intensive_kernel(float* data, int N) {
 }
 
 #endif // STREAM_MANAGER_CUH
+=======
+>>>>>>> main

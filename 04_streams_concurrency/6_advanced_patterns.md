@@ -2,33 +2,52 @@
 
 Beyond basic stream operations, CUDA enables sophisticated coordination patterns that maximize GPU utilization through complex producer-consumer relationships, pipeline architectures, and dynamic load balancing strategies.
 
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Previous: [CUDA Graphs](5_cuda_graphs.md)**
+
+---
+
 ## Producer-Consumer Patterns
 
-In this pattern, one or more "Producer" streams generate data (e.g., via H2D copy or kernel generation), and "Consumer" streams process it. Buffering and synchronization are critical.
+Producer-consumer patterns enable efficient data flow management where different components generate and consume data at potentially different rates, requiring sophisticated buffering and synchronization strategies.
 
-> **Implementation**: A multi-buffered `StreamProducerConsumer` system is implemented in [`src/04_streams_concurrency/producer_consumer.cuh`](../src/04_streams_concurrency/producer_consumer.cuh). It handles:
-> - Circular buffer management.
-> - Signaling between producer and consumer using events.
-> - Handling rate mismatches.
+### StreamProducerConsumer Implementation
 
-## Pipeline Architecture Patterns
+A ring-buffer based system where a producer stream fills buffers and a consumer stream processes them, coordinated by CUDA events.
 
-Stream-based pipelines split processing into stages (e.g., Preprocess -> Compute -> Postprocess), with each stage running in its own stream or sequence of streams.
+> **Full Implementation**: [`src/04_streams_concurrency/StreamProducerConsumer.cuh`](../src/04_streams_concurrency/StreamProducerConsumer.cuh)
 
-### Multi-Stage Pipeline
-The `StreamPipeline` class ([`src/04_streams_concurrency/stream_pipeline.cuh`](../src/04_streams_concurrency/stream_pipeline.cuh)) demonstrates:
-- Configuring stages with custom processing functions.
-- Managing intermediate buffers between stages.
-- Executing batches of data through the pipeline with overlap.
-- Analyzing bottlenecks (identifying the slowest stage).
+```cpp
+#include "../src/04_streams_concurrency/StreamProducerConsumer.cuh"
+
+void producer_consumer_demo() {
+    StreamProducerConsumer<float> system(1024*1024, 4);
+
+    // Launch threads for producer and consumer logic...
+}
+```
+
+## Pipeline Architecture
+
+Stream-based pipelines enable complex multi-stage processing where each stage can operate independently and concurrently.
+
+### StreamPipeline Implementation
+
+A multi-stage pipeline with dynamic load balancing. Each stage runs in its own stream, waiting on the previous stage's completion event for the specific data buffer.
+
+> **Full Implementation**: [`src/04_streams_concurrency/StreamPipeline.cuh`](../src/04_streams_concurrency/StreamPipeline.cuh)
 
 ## Dynamic Load Balancing
 
-Static assignment of work to streams can lead to imbalance if task duration varies. Dynamic load balancing assigns tasks to the least busy stream or worker.
+Distributing work across multiple streams based on real-time performance characteristics.
 
-### Adaptive Stream Balancer
-The `AdaptiveStreamBalancer` ([`src/04_streams_concurrency/stream_balancer.cuh`](../src/04_streams_concurrency/stream_balancer.cuh)) implements:
-- A pool of worker streams.
-- A task queue.
-- Logic to select the optimal worker based on estimated load/queue depth.
-- Statistics tracking to adaptively manage resources.
+### AdaptiveStreamBalancer Implementation
+
+Dynamically assigns tasks to a pool of worker streams based on their current load and queue depth.
+
+> **Full Implementation**: [`src/04_streams_concurrency/AdaptiveStreamBalancer.cuh`](../src/04_streams_concurrency/AdaptiveStreamBalancer.cuh)
+
+## Nsight Debugging Tips
+
+*   **Nsight Systems**: Use to visualize stream timelines and identify gaps (bubbles) in execution.
+*   **Serialization**: Look for unexpected synchronization. `cudaDeviceSynchronize` is a common culprit. Ensure default stream usage is intentional.
+*   **Memory Throughput**: Check if H2D/D2H copies are overlapping with kernels.

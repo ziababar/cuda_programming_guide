@@ -2,34 +2,75 @@
 
 Memory transfer optimization is crucial for achieving peak performance in CUDA applications. Understanding the memory hierarchy, transfer patterns, and bandwidth utilization strategies can significantly impact overall application throughput.
 
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Previous: [Asynchronous Operations](2_asynchronous_operations.md)**
+
+---
+
 ## Pinned Memory Deep Dive
 
-Pinned (page-locked) memory is essential for achieving maximum memory transfer bandwidth and enabling true asynchronous operations. Unlike pageable memory, pinned memory cannot be swapped out by the OS, allowing the GPU to access it directly via DMA (Direct Memory Access).
+Pinned (page-locked) memory is essential for achieving maximum memory transfer bandwidth and enabling true asynchronous operations. Standard `malloc` memory is pageable; the driver must copy it to a temporary pinned buffer before transferring to the GPU. `cudaHostAlloc` skips this step.
 
 ### Key Benefits
-- **Higher Bandwidth**: Faster transfer speeds (often 2-3x).
-- **Asynchronous Transfers**: `cudaMemcpyAsync` requires pinned memory for the host buffer to be truly asynchronous.
-- **Zero-Copy Access**: Kernels can access pinned host memory directly (mapped memory).
+*   **Higher Bandwidth**: Avoids extra CPU copy.
+*   **Asynchrony**: Allows `cudaMemcpyAsync` to return immediately.
+*   **Mapped Memory**: Can be mapped into the device address space (Zero-Copy).
 
-> **Implementation**: A robust `PinnedMemoryManager` is available in [`src/04_streams_concurrency/pinned_memory_manager.cuh`](../src/04_streams_concurrency/pinned_memory_manager.cuh), enabling easy allocation with various flags (Write Combined, Mapped, etc.) and tracking usage.
+### PinnedMemoryManager Implementation
+
+The `PinnedMemoryManager` class simplifies:
+*   Allocation/Deallocation of pinned memory
+*   Tracking memory usage
+*   Managing allocation flags (WriteCombined, Mapped, etc.)
+
+> **Full Implementation**: [`src/04_streams_concurrency/PinnedMemoryManager.cuh`](../src/04_streams_concurrency/PinnedMemoryManager.cuh)
+
+```cpp
+#include "../src/04_streams_concurrency/PinnedMemoryManager.cuh"
+
+void demonstrate_pinned_memory() {
+    PinnedMemoryManager manager;
+
+    // Allocate write-combined memory (fast for CPU write, PCI-E read)
+    void* ptr = manager.allocate(1024*1024, cudaHostAllocWriteCombined);
+
+    // Use memory...
+
+    manager.deallocate(ptr);
+}
+```
 
 ## Bandwidth Optimization Strategies
 
-To maximize bandwidth:
-1. **Optimize Transfer Size**: Small transfers have high overhead. Batching small transfers into larger chunks usually improves throughput.
-2. **Use Concurrent Transfers**: Utilize multiple streams to saturate the bus, especially if transfers are bidirectional (duplex).
+Maximizing saturation of the PCIe bus requires careful tuning of transfer sizes and concurrency.
 
-The `BandwidthOptimizer` class in [`src/04_streams_concurrency/bandwidth_optimizer.cuh`](../src/04_streams_concurrency/bandwidth_optimizer.cuh) provides tools to:
-- Test different transfer sizes to find the "sweet spot".
-- Benchmark concurrent transfers with varying stream counts.
+### Optimization Techniques
+1.  **Batching**: Group small transfers into larger chunks.
+2.  **Concurrency**: Use multiple streams to saturate the link (though one stream often saturates PCIe x16).
+3.  **Direction**: Bi-directional transfers can utilize full duplex PCIe bandwidth.
 
-## Advanced Transfer Patterns
+### BandwidthOptimizer Implementation
 
-### Bidirectional Transfer Optimization
+The `BandwidthOptimizer` helps identify optimal parameters:
+*   Test transfer sizes
+*   Test concurrent stream counts
 
-Modern GPUs have dual copy engines, allowing simultaneous data transfer in both directions (Host-to-Device and Device-to-Host).
+> **Full Implementation**: [`src/04_streams_concurrency/BandwidthOptimizer.cuh`](../src/04_streams_concurrency/BandwidthOptimizer.cuh)
 
-- **Sequential**: Upload -> Download (one direction active at a time).
-- **Overlapped**: Upload Stream + Download Stream (both active).
+## Bidirectional Transfer Patterns
 
-> **Demo**: The `BidirectionalTransferManager` in [`src/04_streams_concurrency/bidirectional_transfer.cuh`](../src/04_streams_concurrency/bidirectional_transfer.cuh) demonstrates how to implement sophisticated bidirectional patterns and pipelines involving simultaneous uploads, computation, and downloads.
+PCIe is full-duplex, meaning it can send and receive simultaneously. Overlapping Host-to-Device (H2D) and Device-to-Host (D2H) copies can double effective throughput.
+
+### BidirectionalTransferManager Implementation
+
+Manages dual-ring buffers to sustain simultaneous traffic in both directions.
+
+> **Full Implementation**: [`src/04_streams_concurrency/BidirectionalTransferManager.cuh`](../src/04_streams_concurrency/BidirectionalTransferManager.cuh)
+
+```cpp
+#include "../src/04_streams_concurrency/BidirectionalTransferManager.cuh"
+
+void demonstrate_bidirectional() {
+    BidirectionalTransferManager manager(4, 1024*1024);
+    manager.demonstrate_bidirectional_overlap();
+}
+```

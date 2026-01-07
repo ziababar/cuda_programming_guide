@@ -1,17 +1,12 @@
-#ifndef EVENT_MANAGER_CUH
-#define EVENT_MANAGER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
 #include <vector>
-#include <map>
 #include <string>
+#include <map>
 #include <queue>
 #include <chrono>
 #include <cstdio>
-#include <thread>
-
-// Forward declarations for kernel used in demo
-__global__ void event_demo_kernel(float* data, int N, int kernel_id);
+#include <algorithm>
 
 // Advanced event management system for complex applications
 class EventManager {
@@ -237,6 +232,7 @@ public:
         printf("EventManager cleanup complete\n");
     }
 };
+<<<<<<< HEAD
 
 __global__ void event_demo_kernel(float* data, int N, int kernel_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -259,3 +255,5 @@ __global__ void event_demo_kernel(float* data, int N, int kernel_id) {
 }
 
 #endif // EVENT_MANAGER_CUH
+=======
+>>>>>>> main

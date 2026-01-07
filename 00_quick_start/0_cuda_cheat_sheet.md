@@ -107,18 +107,14 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 ```
       Registers (Thread Private)
-             |
-             v
+                 |
     Shared Memory / L1 Cache (Block Local)
-             |
-             v
+                 |
       L2 Cache (Global, All SMs)
-             |
-             v
+                 |
       Global Memory (Device DRAM)
-             |
-             v
-      System Memory (Host RAM) (via PCIe/NVLink)
+                 |
+      System Memory (Host RAM)
 ```
 
 **Memory Access Patterns:**
@@ -204,26 +200,7 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 ---
 
-## 8. Common Errors Lookup
-
-| Error Code | Meaning | Common Cause |
-|------------|---------|--------------|
-| `cudaErrorInvalidConfiguration` | Invalid grid/block dims | `threadsPerBlock > 1024` or shared mem > limit |
-| `cudaErrorMemoryAllocation` | OOM (Out Of Memory) | Allocating more VRAM than available |
-| `cudaErrorLaunchFailure` | Kernel crashed | Segfault, invalid memory access in kernel |
-| `cudaErrorInitializationError` | Driver/Runtime mismatch | Driver not installed or too old |
-| `cudaErrorIllegalAddress` | Invalid pointer access | Accessing NULL or freed pointer in kernel |
-
-## 9. Performance Checklist
-
-- [ ] **Occupancy**: Are you using enough threads to hide latency? (Target > 60%)
-- [ ] **Coalescing**: Do consecutive threads access consecutive memory addresses?
-- [ ] **Divergence**: Do warps diverge often? (Avoid `if-else` dependent on `threadIdx`)
-- [ ] **Shared Memory**: Are you using it to reuse data? Any bank conflicts?
-- [ ] **Host-Device Transfer**: Are copies minimized? Overlapped with compute?
-- [ ] **Precision**: Do you really need `double`? (`float` or `half` is faster)
-
-## 10. Key Code Snippets
+##  Key Code Snippets
 
 ```cpp
 // Thread Indexing (2D Grid)
@@ -235,11 +212,7 @@ __shared__ float tile[32][32];
 tile[threadIdx.y][threadIdx.x] = input[y][x];
 __syncthreads();
 
-// Async Copy & Execution (Streams)
-cudaStream_t stream;
-cudaStreamCreate(&stream);
-cudaMemcpyAsync(d_data, h_data, size, cudaMemcpyHostToDevice, stream);
-myKernel<<<grid, block, 0, stream>>>(d_data); // Launch in stream
-cudaMemcpyAsync(h_result, d_result, size, cudaMemcpyDeviceToHost, stream);
-cudaStreamSynchronize(stream);
+// Async Copy
+cudaMemcpyAsync(dst, src, size, cudaMemcpyHostToDevice, stream);
 ```
+  |

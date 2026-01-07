@@ -1,18 +1,19 @@
-#ifndef GRAPH_MANAGER_CUH
-#define GRAPH_MANAGER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
-#include <string>
 #include <vector>
+#include <string>
 #include <map>
 #include <chrono>
 #include <cstdio>
 #include <algorithm>
 
+<<<<<<< HEAD
 // Forward declarations for kernels
 __global__ void graph_stage1_kernel(float* input, float* output, int N);
 __global__ void graph_stage2_kernel(float* input, float* output, int N);
 
+=======
+>>>>>>> main
 // Advanced CUDA Graph management for production applications
 class GraphManager {
 private:
@@ -367,6 +368,7 @@ public:
         printf("GraphManager cleanup complete\n");
     }
 };
+<<<<<<< HEAD
 
 __global__ void graph_stage1_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -383,3 +385,5 @@ __global__ void graph_stage2_kernel(float* input, float* output, int N) {
 }
 
 #endif // GRAPH_MANAGER_CUH
+=======
+>>>>>>> main

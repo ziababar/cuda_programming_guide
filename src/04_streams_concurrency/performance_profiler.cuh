@@ -1,16 +1,15 @@
-#ifndef PERFORMANCE_PROFILER_CUH
-#define PERFORMANCE_PROFILER_CUH
-
+#pragma once
 #include <cuda_runtime.h>
-#include <string>
-#include <vector>
 #include <map>
+#include <vector>
+#include <string>
+#include <chrono>
 #include <cstdio>
 #include <algorithm>
-#include <cmath>
 #include <functional>
+#include <cmath>
 
-// Forward declarations for kernel used in demo
+// Forward declare kernels
 __global__ void complex_math_kernel(float* input, float* output, int N);
 __global__ void simple_math_kernel(float* input, float* output, int N);
 
@@ -218,6 +217,7 @@ public:
         printf("PerformanceProfiler cleanup complete\n");
     }
 };
+<<<<<<< HEAD
 
 __global__ void complex_math_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -245,3 +245,5 @@ __global__ void simple_math_kernel(float* input, float* output, int N) {
 }
 
 #endif // PERFORMANCE_PROFILER_CUH
+=======
+>>>>>>> main

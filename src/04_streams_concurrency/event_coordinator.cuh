@@ -1,22 +1,13 @@
-#ifndef EVENT_COORDINATOR_CUH
-#define EVENT_COORDINATOR_CUH
-
+#pragma once
 #include <cuda_runtime.h>
-#include <string>
-#include <vector>
 #include <map>
-#include <functional>
+#include <vector>
+#include <string>
 #include <queue>
-#include <cstdio>
+#include <functional>
 #include <thread>
-#include <chrono>
+#include <cstdio>
 #include <algorithm>
-
-// Forward declarations for kernels
-__global__ void initialization_kernel(float* data, int N);
-__global__ void combine_kernel(float* data1, float* data2, float* output, int N);
-__global__ void complex_math_kernel(float* input, float* output, int N); // From performance_profiler.cuh
-__global__ void simple_math_kernel(float* input, float* output, int N); // From performance_profiler.cuh
 
 // Complex event-driven coordination system
 class EventCoordinator {
@@ -221,6 +212,7 @@ public:
         printf("EventCoordinator cleanup complete\n");
     }
 };
+<<<<<<< HEAD
 
 __global__ void initialization_kernel(float* data, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -237,3 +229,5 @@ __global__ void combine_kernel(float* data1, float* data2, float* output, int N)
 }
 
 #endif // EVENT_COORDINATOR_CUH
+=======
+>>>>>>> main
