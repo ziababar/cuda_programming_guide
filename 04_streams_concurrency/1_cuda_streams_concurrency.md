@@ -6,7 +6,7 @@ CUDA streams are the backbone of high-performance GPU programming, enabling asyn
 
 ---
 
-##  **Table of Contents**
+## **Table of Contents**
 
 1. **[Stream Fundamentals](1_stream_fundamentals.md)**
    - Stream Types and Properties
@@ -40,7 +40,7 @@ CUDA streams are the backbone of high-performance GPU programming, enabling asyn
 
 ---
 
-##  **Quick Reference**
+## **Quick Reference**
 
 ### **Stream Hierarchy:**
 ```

@@ -20,17 +20,6 @@ CUDA provides multiple levels of synchronization, each with different scopes, pe
 | **Grid** | Entire kernel | Kernel boundaries | Slow | Multi-stage algorithms |
 | **Device** | Multiple kernels | `cudaDeviceSynchronize()` | Very slow | Host-device coordination |
 
-### **Memory Ordering & Fences**
-
-Synchronization is not just about timing; it's about **memory visibility**.
-
-- **`__syncthreads()`**: Barrier for all threads in a block + memory fence (shared/global).
-- **`__threadfence_block()`**: Ensures memory writes are visible to all threads in the *block*.
-- **`__threadfence()`**: Ensures memory writes are visible to all threads in the *device*.
-- **`__threadfence_system()`**: Ensures memory writes are visible to *entire system* (Host + Device).
-
-> **Crucial**: Fences do *not* pause threads (like `__syncthreads()` does). They only enforce memory ordering.
-
 ###  **Synchronization Models**
 
 #### **Barrier Synchronization:**
@@ -64,55 +53,61 @@ __global__ void barrier_synchronization_demo() {
 }
 ```
 
-#### **Modern Synchronization (C++20 / CUDA 11+)**
-CUDA 11 introduced `cuda::barrier` and `cuda::pipeline` for more flexible synchronization, similar to C++20 standard library features.
-
-```cpp
-#include <cuda/barrier>
-#include <cuda/pipeline>
-
-__global__ void modern_sync_demo(float* data, int N) {
-    // Basic block barrier using libcu++
-    __shared__ cuda::barrier<cuda::thread_scope_block> bar;
-    if (threadIdx.x == 0) {
-        bar.init(blockDim.x);
-    }
-    __syncthreads();
-
-    // Do work...
-    // Arrive and wait
-    bar.arrive_and_wait();
-}
-```
-
 #### **Producer-Consumer Pattern:**
 ```cpp
-// Producer-consumer pattern using phases to avoid deadlock
-// Note: __syncthreads() must be called by ALL threads in the block
+// Producer-consumer synchronization with shared memory
 __global__ void producer_consumer_demo() {
-    __shared__ float buffer[256];
+    __shared__ float buffer[128];
+    __shared__ int write_pos;
+    __shared__ int read_pos;
+    __shared__ int data_count;
+
     int tid = threadIdx.x;
 
-    // Phase 1: Producer Phase
-    // All threads participate or wait at the same barrier
-    if (tid < 128) {
-        // First 128 threads produce data
-        buffer[tid] = tid * 2.0f;
+    // Initialize shared variables
+    if (tid == 0) {
+        write_pos = 0;
+        read_pos = 0;
+        data_count = 0;
     }
-    // Wait for all producers to finish writing
     __syncthreads();
 
-    // Phase 2: Consumer Phase
-    // All threads can now safely read the produced data
-    if (tid >= 128) {
-        // Consumers read data produced by others
-        // e.g. Thread 128 reads from index 0
-        int read_idx = tid - 128;
-        float data = buffer[read_idx];
-        printf("Consumer %d read: %.2f\n", tid, data);
-    }
+    // Producer threads (first half)
+    if (tid < blockDim.x / 2) {
+        for (int i = 0; i < 4; i++) {  // Each producer creates 4 items
+            float data = tid * 4 + i;
 
-    // Optional: Barrier if you need to reuse buffer for next iteration
-    __syncthreads();
+            // Wait for buffer space
+            while (data_count >= 128) {
+                __syncthreads();
+            }
+
+            // Produce data
+            int pos = atomicAdd(&write_pos, 1) % 128;
+            buffer[pos] = data;
+            atomicAdd(&data_count, 1);
+
+            __syncthreads();
+        }
+    }
+    // Consumer threads (second half)
+    else {
+        for (int i = 0; i < 2; i++) {  // Each consumer processes 2 items
+            // Wait for data
+            while (data_count <= 0) {
+                __syncthreads();
+            }
+
+            // Consume data
+            int pos = atomicAdd(&read_pos, 1) % 128;
+            float data = buffer[pos];
+            atomicSub(&data_count, 1);
+
+            // Process data
+            printf("Consumer %d processed: %.1f\n", tid, data);
+
+            __syncthreads();
+        }
+    }
 }
 ```
