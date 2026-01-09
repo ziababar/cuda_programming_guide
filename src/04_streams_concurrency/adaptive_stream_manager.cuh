@@ -205,3 +205,6 @@ public:
 };
 
 #endif // ADAPTIVE_STREAM_MANAGER_CUH
+
+#endif // ADAPTIVE_STREAM_MANAGER_CUH
+

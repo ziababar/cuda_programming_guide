@@ -22,18 +22,6 @@ Understanding the CUDA execution model is **essential** for writing performant G
 | **Block** | 1-1024 threads | Shared memory + sync | Part of SM | Cooperative algorithms | [ Thread Guide](2_thread_hierarchy.md#blocks) |
 | **Grid** | Many blocks | Global scope | Entire GPU | Massive parallelism | [ Thread Guide](2_thread_hierarchy.md#grids) |
 
-##  **Hardware vs. Logical Hierarchy**
-
-It's crucial to distinguish between how you *write* code (Logical) and how the GPU *executes* it (Physical).
-
-| Logical (Software) | Physical (Hardware) | Relationship |
-|--------------------|---------------------|--------------|
-| **Thread** | **CUDA Core / SIMT Lane** | A thread is executed on a core (time-sliced). |
-| **Block** | **Streaming Multiprocessor (SM)** | A block is assigned to one SM and stays there. |
-| **Grid** | **GPU (Device)** | The grid runs across all available SMs on the GPU. |
-
-> **Note:** A single SM can execute multiple blocks concurrently (if resources allow), but a single block cannot span multiple SMs.
-
 ##  **Launch Configuration Quick Patterns**
 
 ###  **1D Problems (Arrays, Vectors)**
@@ -206,12 +194,6 @@ if (sharedMemSize > prop.sharedMemPerBlock) {
 }
 ```
 
-### **Issue: Memory Coalescing**
-**Symptom:** High DRAM bandwidth usage but low effective throughput.
-**Quick Fixes:**
-- Ensure `threadIdx.x` reads/writes consecutive addresses (`data[base + threadIdx.x]`).
-- Avoid Structure-of-Arrays (SoA) to Array-of-Structures (AoS) conversion in kernel if possible, or use shared memory to realign.
-
 ##  **Profiling Quick Commands**
 
 ###  **Occupancy Analysis**
@@ -252,7 +234,7 @@ GPU Performance Issue?
  Indexing or memory access issues?
     Review thread hierarchy → [ Thread Guide](2_thread_hierarchy.md)
  Need optimization examples?
-     Study performance patterns → [ Performance Profiling](../05_performance_profiling/1_profiling_overview.md)
+     Study performance patterns → [ Examples Guide](1f_performance_examples.md)
 ```
 
 ##  **Key Principles**

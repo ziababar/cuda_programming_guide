@@ -29,3 +29,11 @@ The `PerformanceProfiler` class uses events to measure execution time of regions
 The `EventCoordinator` class builds complex dependency graphs using events to coordinate execution across multiple streams.
 
 **Source Code**: [`../src/04_streams_concurrency/event_coordinator.cuh`](../src/04_streams_concurrency/event_coordinator.cuh)
+Events enable complex dependency graphs where streams wait on each other without host intervention.
+
+### Event Coordinator
+The `EventCoordinator` class ([`src/04_streams_concurrency/event_coordinator.cuh`](../src/04_streams_concurrency/event_coordinator.cuh)) demonstrates how to build and execute a dependency graph of tasks.
+- **Nodes**: Work units (kernels).
+- **Dependencies**: Events that must complete before a node starts.
+- **Execution**: The coordinator schedules nodes onto streams as their dependencies are satisfied.
+

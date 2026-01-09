@@ -94,3 +94,6 @@ public:
 };
 
 #endif // PINNED_MEMORY_MANAGER_CUH
+
+#endif // PINNED_MEMORY_MANAGER_CUH
+

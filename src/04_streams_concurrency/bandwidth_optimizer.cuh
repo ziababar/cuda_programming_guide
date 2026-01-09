@@ -173,3 +173,6 @@ private:
 };
 
 #endif // BANDWIDTH_OPTIMIZER_CUH
+
+#endif // BANDWIDTH_OPTIMIZER_CUH
+

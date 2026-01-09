@@ -8,6 +8,11 @@
 #include <cstdio>
 #include <cuda_runtime.h>
 
+// Forward declarations for kernels
+__global__ void graph_stage1_kernel(float* input, float* output, int N);
+__global__ void graph_stage2_kernel(float* input, float* output, int N);
+
+
 // Advanced CUDA Graph management for production applications
 class GraphManager {
 private:
@@ -364,3 +369,20 @@ public:
 };
 
 #endif // GRAPH_MANAGER_CUH
+
+__global__ void graph_stage1_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = sqrt(fabs(input[tid])) + sin(input[tid]);
+    }
+}
+
+__global__ void graph_stage2_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = cos(input[tid]) + log(fabs(input[tid]) + 1.0f);
+    }
+}
+
+#endif // GRAPH_MANAGER_CUH
+

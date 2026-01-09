@@ -239,3 +239,26 @@ public:
 };
 
 #endif // EVENT_MANAGER_CUH
+
+__global__ void event_demo_kernel(float* data, int N, int kernel_id) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    if (tid < N) {
+        float value = tid * 0.001f;
+
+        // Different computation patterns per kernel
+        for (int i = 0; i < kernel_id * 20; i++) {
+            value = sin(value) + cos(value * 0.1f);
+        }
+
+        data[tid] = value;
+    }
+
+    // First thread reports completion
+    if (tid == 0) {
+        printf("Kernel %d execution complete\n", kernel_id);
+    }
+}
+
+#endif // EVENT_MANAGER_CUH
+
