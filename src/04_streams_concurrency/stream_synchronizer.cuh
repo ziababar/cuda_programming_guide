@@ -1,10 +1,19 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_SYNCHRONIZER_CUH
+#define STREAM_SYNCHRONIZER_CUH
+
 #include <vector>
 #include <map>
 #include <string>
 #include <cstdio>
-#include <cmath>
+#include <cuda_runtime.h>
+
+// Forward declaration of kernels
+__global__ void parallel_work_kernel(int stream_id);
+__global__ void join_work_kernel();
+__global__ void pipeline_stage_kernel(int stage, int iteration);
+__global__ void initial_processing_kernel();
+__global__ void parallel_processing_kernel(int branch_id);
+__global__ void aggregation_kernel();
 
 // Advanced synchronization techniques for complex workflows
 class StreamSynchronizer {
@@ -77,40 +86,85 @@ public:
                producer_stream, consumer_stream);
     }
 
-    // Fork-join pattern (requires kernels to be defined/declared)
-    // Note: Kernels should be defined in a .cu file or declared here.
-    // Assuming parallel_work_kernel and join_work_kernel are available in context where this header is used
-    // or we can make this a template or accept function pointers.
-    // For simplicity in this extraction, we will keep the structure but this requires the kernels to be visible.
-
-    // To make this standalone, we might need to remove specific kernel calls or make them generic.
-    // However, the original code had them hardcoded.
-    // Let's assume the user will include the kernel definitions before using this class methods that call them,
-    // or we can forward declare them if we know the signature.
-    // Forward declarations:
-    // __global__ void parallel_work_kernel(int stream_id);
-    // __global__ void join_work_kernel();
-    // __global__ void pipeline_stage_kernel(int stage, int iteration);
-    // __global__ void initial_processing_kernel();
-    // __global__ void parallel_processing_kernel(int branch_id);
-    // __global__ void aggregation_kernel();
-
-    /*
+    // Fork-join pattern
     void fork_join_pattern(const std::vector<int>& parallel_streams,
                           int join_stream) {
-        // ... implementation requires kernels ...
-    }
-    */
-    // Since we are extracting to a header, and the kernels are specific to the example,
-    // strictly speaking, this class is tied to the example.
-    // We will extract the class definition. For the methods calling specific kernels,
-    // we should either include the kernels or comment out the specific calls if we want a generic library.
-    // But the user request is to extract complex implementations.
-    // I will extract the class and forward declare the kernels, or keep the class in the markdown if it's too coupled.
-    // The reviewer said "extract remaining large classes to src/ for consistency".
-    // I will forward declare the kernels.
+        printf("Executing fork-join pattern...\n");
 
-    // ... (rest of the methods) ...
+        // Fork: Launch work on parallel streams
+        for (int stream_id : parallel_streams) {
+            parallel_work_kernel<<<256, 256, 0, streams[stream_id]>>>(stream_id);
+            cudaEventRecord(sync_events[stream_id], streams[stream_id]);
+        }
+
+        // Join: Wait for all parallel work to complete
+        for (int stream_id : parallel_streams) {
+            cudaStreamWaitEvent(streams[join_stream], sync_events[stream_id], 0);
+        }
+
+        // Continue with joined work
+        join_work_kernel<<<256, 256, 0, streams[join_stream]>>>();
+
+        printf("Fork-join pattern complete\n");
+    }
+
+    // Pipeline stage synchronization
+    void pipeline_stage_sync(int stage_count, int iterations) {
+        printf("Executing %d-stage pipeline for %d iterations...\n",
+               stage_count, iterations);
+
+        for (int iter = 0; iter < iterations; iter++) {
+            for (int stage = 0; stage < stage_count; stage++) {
+                int stream_id = stage % streams.size();
+
+                // Wait for previous stage if not first stage
+                if (stage > 0) {
+                    int prev_stream = (stage - 1) % streams.size();
+                    cudaStreamWaitEvent(streams[stream_id], sync_events[prev_stream], 0);
+                }
+
+                // Execute stage
+                pipeline_stage_kernel<<<128, 128, 0, streams[stream_id]>>>(stage, iter);
+
+                // Signal stage completion
+                cudaEventRecord(sync_events[stream_id], streams[stream_id]);
+            }
+        }
+
+        printf("Pipeline execution complete\n");
+    }
+
+    // Advanced dependency graph execution
+    void execute_dependency_graph() {
+        printf("Executing complex dependency graph...\n");
+
+        // Example dependency graph:
+        // Stream 0: Initial data processing
+        // Stream 1 & 2: Parallel processing (depend on stream 0)
+        // Stream 3: Final aggregation (depends on streams 1 & 2)
+
+        // Stage 1: Initial processing
+        initial_processing_kernel<<<256, 256, 0, streams[0]>>>();
+        cudaEventRecord(sync_events[0], streams[0]);
+
+        // Stage 2: Parallel processing (both depend on stage 1)
+        cudaStreamWaitEvent(streams[1], sync_events[0], 0);
+        cudaStreamWaitEvent(streams[2], sync_events[0], 0);
+
+        parallel_processing_kernel<<<256, 256, 0, streams[1]>>>(1);
+        parallel_processing_kernel<<<256, 256, 0, streams[2]>>>(2);
+
+        cudaEventRecord(sync_events[1], streams[1]);
+        cudaEventRecord(sync_events[2], streams[2]);
+
+        // Stage 3: Final aggregation (depends on both parallel stages)
+        cudaStreamWaitEvent(streams[3], sync_events[1], 0);
+        cudaStreamWaitEvent(streams[3], sync_events[2], 0);
+
+        aggregation_kernel<<<256, 256, 0, streams[3]>>>();
+
+        printf("Dependency graph execution complete\n");
+    }
 
     // Synchronize all streams
     void synchronize_all() {
@@ -132,3 +186,5 @@ public:
         printf("StreamSynchronizer destroyed\n");
     }
 };
+
+#endif // STREAM_SYNCHRONIZER_CUH

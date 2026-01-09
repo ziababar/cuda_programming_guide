@@ -1,13 +1,13 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_PIPELINE_CUH
+#define STREAM_PIPELINE_CUH
+
 #include <vector>
 #include <string>
 #include <functional>
 #include <cstdio>
-#include <algorithm>
+#include <cuda_runtime.h>
 
-// Pipeline kernel declarations - forward declared to allow usage in the class
-// In a real project, these would be in a .cu file or declared in a separate header
+// Forward declaration of kernels
 __global__ void pipeline_preprocess_kernel(float* input, float* output, int N);
 __global__ void pipeline_compute_kernel(float* input, float* output, int N);
 __global__ void pipeline_postprocess_kernel(float* input, float* output, int N);
@@ -376,7 +376,8 @@ public:
         printf("StreamPipeline cleanup complete\n");
     }
 };
-<<<<<<< HEAD
+
+#endif // STREAM_PIPELINE_CUH
 
 __global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -463,5 +464,4 @@ void demonstrate_pipeline_patterns() {
 }
 
 #endif // STREAM_PIPELINE_CUH
-=======
->>>>>>> main
+

@@ -1,51 +1,48 @@
 # Stream Fundamentals
 
-CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. Understanding streams deeply is essential for achieving optimal GPU utilization and building scalable parallel applications.
-
-**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../02_memory_hierarchy/1_cuda_memory_hierarchy.md)**
-
----
+CUDA streams represent ordered sequences of GPU operations that execute asynchronously with respect to the host and other streams, enabling sophisticated concurrency patterns.
 
 ## Stream Types and Properties
 
-CUDA streams represent ordered sequences of GPU operations that execute asynchronously with respect to the host and other streams.
-
 ### Stream Hierarchy and Characteristics
 
-1.  **Default Stream (Stream 0)**:
-    *   Synchronous with the host (blocking behavior).
-    *   Implicitly synchronizes with all other streams (legacy behavior) or acts independently (per-thread default stream).
-    *   Used when no explicit stream is specified.
+1. **Default Stream (Stream 0)** - Synchronous Behavior
+   - Synchronous with host
+   - Blocks other streams until completion
+   - Used when no explicit stream specified
 
-2.  **Explicit Streams**:
-    *   Asynchronous with the host.
-    *   Can execute concurrently with other streams.
-    *   Enable overlap of computation and memory transfers.
+2. **Explicit Streams** - Asynchronous Behavior
+   - Asynchronous with host
+   - Can execute concurrently with other streams
+   - Enable overlap and pipelining
 
-### Code Example: Stream Fundamentals
+3. **Stream Priorities**
+   - Streams can be assigned priorities to hint the scheduler.
+   - Ranges from high (lower number) to low (higher number).
+
+### Stream Execution Model
+
+1. **FIFO Ordering Within Streams**: Operations within each stream execute in submission order.
+2. **Inter-Stream Concurrency**: Different streams can execute concurrently. GPU scheduler interleaves stream operations.
+3. **Synchronization**:
+   - `cudaStreamSynchronize()`: Wait for specific stream.
+   - `cudaDeviceSynchronize()`: Wait for all streams.
+   - Events: Fine-grained inter-stream dependencies.
+
+## Stream Management Patterns
+
+### Advanced Stream Management
+
+For production applications, managing multiple streams efficiently is crucial. The `StreamManager` class provides a robust way to handle stream pools, priorities, and workload assignment.
+
+**Source Code**: [`../src/04_streams_concurrency/stream_manager.cuh`](../src/04_streams_concurrency/stream_manager.cuh)
 
 ```cpp
-// Comprehensive stream type demonstration
-void demonstrate_stream_fundamentals() {
-    printf("=== CUDA Stream Fundamentals ===\n");
+#include "../src/04_streams_concurrency/stream_manager.cuh"
 
-    // 1. Default Stream (Stream 0) - Synchronous Behavior
-    printf("1. Default Stream Characteristics:\n");
-    printf("   - Synchronous with host\n");
-    printf("   - Blocks other streams until completion\n");
+void demonstrate_stream_manager() {
+    printf("=== Stream Manager Demo ===\n");
 
-    // ... (Sequential execution logic) ...
-
-    // 2. Explicit Streams - Asynchronous Behavior
-    printf("2. Explicit Stream Characteristics:\n");
-    printf("   - Asynchronous with host\n");
-    printf("   - Can execute concurrently with other streams\n");
-
-    cudaStream_t stream1, stream2;
-    cudaStreamCreate(&stream1);
-    cudaStreamCreate(&stream2);
-
-<<<<<<< HEAD
     // Operations in different streams can overlap
     cudaMemsetAsync(d_data1, 0, size, stream1);
     cudaMemsetAsync(d_data2, 1, size, stream2);
@@ -80,58 +77,4 @@ A `StreamManager` typically handles:
 // Usage example of StreamManager
 #include "../src/04_streams_concurrency/stream_manager.cuh"
 
-void demonstrate_stream_manager() {
-=======
-    // These can execute concurrently
-    // cudaMemsetAsync(d_data1, 0, size, stream1);
-    // simple_kernel<<<256, 256, 0, stream1>>>(d_data1, 1024);
 
-    // ...
-}
-```
-
-## Stream Execution Model
-
-Operations within a single stream are serialized (FIFO). Operations in different streams can be interleaved or run concurrently by the GPU scheduler.
-
-*   **FIFO Ordering**: `Kernel A` -> `Kernel B` submitted to the same stream are guaranteed to execute in that order.
-*   **Inter-Stream Concurrency**: `Stream 1 (Kernel A)` and `Stream 2 (Kernel B)` have no ordering guarantees relative to each other and may run in parallel if resources allow.
-
-## Advanced Stream Management
-
-For production applications, managing a pool of streams is often necessary. We provide a robust `StreamManager` class to handle stream creation, prioritization, and lifecycle management.
-
-### StreamManager Implementation
-
-The `StreamManager` class provides:
-*   Pool-based stream management
-*   Priority support
-*   Round-robin or load-based allocation
-*   RAII-based cleanup
-
-> **Full Implementation**: [`src/04_streams_concurrency/StreamManager.cuh`](../src/04_streams_concurrency/StreamManager.cuh)
-
-```cpp
-#include "../src/04_streams_concurrency/StreamManager.cuh"
-
-void demonstrate_stream_manager() {
-    printf("=== Stream Manager Demo ===\n");
-
->>>>>>> main
-    // Create manager with priority streams and custom tags
-    std::vector<std::string> tags = {"MemoryOps", "Compute", "HighPrio", "Background"};
-    StreamManager manager(4, true, tags);
-
-    // Assign workloads to appropriate streams
-<<<<<<< HEAD
-    cudaStream_t compute_stream = manager.get_stream_for_workload("compute_intensive");
-
-    // Launch operations
-=======
-    cudaStream_t memory_stream = manager.get_stream_for_workload("memory_intensive");
-    cudaStream_t compute_stream = manager.get_stream_for_workload("compute_intensive");
-
->>>>>>> main
-    // ...
-}
-```

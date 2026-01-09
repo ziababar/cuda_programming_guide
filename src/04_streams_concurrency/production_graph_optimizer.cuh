@@ -1,14 +1,17 @@
-#pragma once
-#include "graph_manager.cuh"
-#include <map>
+#ifndef PRODUCTION_GRAPH_OPTIMIZER_CUH
+#define PRODUCTION_GRAPH_OPTIMIZER_CUH
+
 #include <vector>
+#include <map>
 #include <string>
 #include <limits>
 #include <algorithm>
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
+#include <cuda_runtime.h>
+#include "graph_manager.cuh"
 
-// Forward declare kernels
+// Forward declaration of kernels
 __global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id);
 
 // Production-ready graph optimization and management
@@ -293,3 +296,5 @@ public:
         printf("========================================\n");
     }
 };
+
+#endif // PRODUCTION_GRAPH_OPTIMIZER_CUH

@@ -1,17 +1,15 @@
-#pragma once
-#include <cuda_runtime.h>
-#include <map>
+#ifndef PERFORMANCE_PROFILER_CUH
+#define PERFORMANCE_PROFILER_CUH
+
 #include <vector>
 #include <string>
-#include <chrono>
-#include <cstdio>
-#include <algorithm>
+#include <map>
+#include <vector>
 #include <functional>
+#include <algorithm>
 #include <cmath>
-
-// Forward declare kernels
-__global__ void complex_math_kernel(float* input, float* output, int N);
-__global__ void simple_math_kernel(float* input, float* output, int N);
+#include <cstdio>
+#include <cuda_runtime.h>
 
 // Sophisticated timing system using CUDA events
 class PerformanceProfiler {
@@ -217,7 +215,8 @@ public:
         printf("PerformanceProfiler cleanup complete\n");
     }
 };
-<<<<<<< HEAD
+
+#endif // PERFORMANCE_PROFILER_CUH
 
 __global__ void complex_math_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -245,5 +244,4 @@ __global__ void simple_math_kernel(float* input, float* output, int N) {
 }
 
 #endif // PERFORMANCE_PROFILER_CUH
-=======
->>>>>>> main
+

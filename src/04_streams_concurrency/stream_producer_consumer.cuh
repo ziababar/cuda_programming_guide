@@ -1,12 +1,17 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_PRODUCER_CONSUMER_CUH
+#define STREAM_PRODUCER_CONSUMER_CUH
+
 #include <vector>
 #include <queue>
-#include <cstdio>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <atomic>
+#include <cstdio>
+#include <cuda_runtime.h>
+
+// Forward declaration of kernels
+__global__ void producer_kernel(float* output, int N, int item_id);
+__global__ void consumer_kernel(float* input, int N, int sequence);
 
 // Advanced producer-consumer pattern with dynamic buffering
 template<typename T>
@@ -248,3 +253,5 @@ public:
         printf("StreamProducerConsumer cleanup complete\n");
     }
 };
+
+#endif // STREAM_PRODUCER_CONSUMER_CUH

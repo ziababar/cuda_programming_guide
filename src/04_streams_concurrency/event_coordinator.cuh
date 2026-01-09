@@ -1,13 +1,15 @@
-#pragma once
-#include <cuda_runtime.h>
-#include <map>
+#ifndef EVENT_COORDINATOR_CUH
+#define EVENT_COORDINATOR_CUH
+
 #include <vector>
 #include <string>
+#include <map>
 #include <queue>
 #include <functional>
+#include <algorithm>
 #include <thread>
 #include <cstdio>
-#include <algorithm>
+#include <cuda_runtime.h>
 
 // Complex event-driven coordination system
 class EventCoordinator {
@@ -212,7 +214,8 @@ public:
         printf("EventCoordinator cleanup complete\n");
     }
 };
-<<<<<<< HEAD
+
+#endif // EVENT_COORDINATOR_CUH
 
 __global__ void initialization_kernel(float* data, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
@@ -229,5 +232,3 @@ __global__ void combine_kernel(float* data1, float* data2, float* output, int N)
 }
 
 #endif // EVENT_COORDINATOR_CUH
-=======
->>>>>>> main

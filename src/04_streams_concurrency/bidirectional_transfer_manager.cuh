@@ -1,9 +1,11 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef BIDIRECTIONAL_TRANSFER_MANAGER_CUH
+#define BIDIRECTIONAL_TRANSFER_MANAGER_CUH
+
 #include <vector>
 #include <cstdio>
+#include <cuda_runtime.h>
 
-// Forward declare kernel
+// Forward declaration of kernels
 __global__ void bidirectional_compute_kernel(float* data, int N, int iteration);
 
 // Sophisticated bidirectional transfer patterns
@@ -234,3 +236,5 @@ public:
         printf("BidirectionalTransferManager cleanup complete\n");
     }
 };
+
+#endif // BIDIRECTIONAL_TRANSFER_MANAGER_CUH

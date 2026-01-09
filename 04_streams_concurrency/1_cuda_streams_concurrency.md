@@ -1,8 +1,12 @@
-# CUDA Streams & Concurrency
+# CUDA Streams & Concurrency Complete Guide
 
-CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. This chapter provides a comprehensive guide to mastering concurrency in CUDA.
+CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. Understanding streams deeply is essential for achieving optimal GPU utilization and building scalable parallel applications.
 
-## Table of Contents
+**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Related: [Memory Hierarchy](../02_memory_hierarchy/1_cuda_memory_hierarchy.md)** | **Architecture: [Execution Model](../01_execution_model/1_cuda_execution_model.md)**
+
+---
+
+## **Table of Contents**
 
 1. **[Stream Fundamentals](1_stream_fundamentals.md)**
    - Stream Types and Properties
@@ -27,29 +31,35 @@ CUDA streams are the backbone of high-performance GPU programming, enabling asyn
 5. **[CUDA Graphs Deep Dive](5_cuda_graphs.md)**
    - Graph Fundamentals and Architecture
    - Advanced Graph Patterns and Optimization
-   - Production Graph Optimization
+   - Production Graph Optimization Strategies
 
-6. **[Advanced Patterns](6_advanced_patterns.md)**
+6. **[Advanced Stream Patterns](6_advanced_patterns.md)**
    - Producer-Consumer Patterns
    - Pipeline Architecture Patterns
    - Dynamic Load Balancing
 
-## Source Code
+---
 
-The implementations discussed in this chapter are available in the `src/04_streams_concurrency/` directory. These include production-ready classes for managing streams, events, and graphs.
+## **Quick Reference**
 
-- `stream_manager.cuh`: Advanced stream pooling and priority management.
-- `stream_sync.cuh`: Synchronization primitives and patterns.
-- `adaptive_stream_manager.cuh`: Dynamic stream allocation.
-- `pinned_memory_manager.cuh`: Robust pinned memory handling.
-- `bandwidth_optimizer.cuh`: Tools for optimizing transfer sizes.
-- `bidirectional_transfer.cuh`: Managing full-duplex transfers.
-- `event_manager.cuh`: Wrapper for CUDA events.
-- `performance_profiler.cuh`: High-precision GPU timing.
-- `event_coordinator.cuh`: Dependency graph execution using events.
-- `graph_manager.cuh`: Comprehensive CUDA Graph management.
-- `graph_patterns.cuh`: Advanced graph usage patterns.
-- `graph_optimizer.cuh`: Optimization strategies for graphs.
-- `producer_consumer.cuh`: Multi-buffered producer-consumer system.
-- `stream_pipeline.cuh`: Multi-stage processing pipelines.
-- `stream_balancer.cuh`: Dynamic load balancing across streams.
+### **Stream Hierarchy:**
+```
+Host Application
+ Default Stream (Blocking)
+ Explicit Streams (Async)
+    Memory Transfers
+    Kernel Executions
+    Event Synchronization
+ CUDA Graphs (Static DAG)
+     Node Dependencies
+     Optimized Execution
+```
+
+### **Key Performance Concepts:**
+| Concept | Description | Performance Impact |
+|---------|-------------|-------------------|
+| **Stream Overlap** | Concurrent compute + memory transfer | 2-4x throughput improvement |
+| **Pinned Memory** | Host memory accessible by DMA | 2-3x transfer speed |
+| **Event Synchronization** | Fine-grained stream coordination | Minimal overhead |
+| **CUDA Graphs** | Static execution DAG | 50-90% launch overhead reduction |
+| **Multi-Stream** | Parallel execution contexts | Near-linear scaling |

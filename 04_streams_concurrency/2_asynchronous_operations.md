@@ -2,102 +2,59 @@
 
 Asynchronous execution is the cornerstone of high-performance GPU programming, enabling overlapped computation, memory transfer concurrency, and sophisticated pipeline orchestration.
 
-**[Back to Main CUDA Notes](../00_quick_start/0_cuda_cheat_sheet.md)** | **Previous: [Stream Fundamentals](1_stream_fundamentals.md)**
-
----
-
 ## Compute-Transfer Overlap
 
 The ability to overlap computation with memory transfers is one of the most powerful features of CUDA streams, often yielding 2-4x throughput improvements.
 
-### Key Concepts
-*   **Engine Concurrency**: GPUs typically have one or more copy engines (DMA) and compute engines (SMs) that can operate simultaneously.
-*   **Pinned Memory**: Essential for asynchronous transfers (see [Memory Transfer](3_memory_transfer.md)).
-*   **Depth-First vs Breadth-First**:
-    *   *Breadth-First*: Launch all copies, then all kernels. (May serialize).
-    *   *Depth-First*: Launch Copy A, Kernel A, Copy B, Kernel B. (Promotes overlap).
+### Basic Overlap Patterns
 
-### Example: Basic Overlap
-
-```cpp
-// Method 2: Chunked with overlap
-for (int chunk = 0; chunk < num_streams; chunk++) {
-    int offset = chunk * chunk_size;
-    cudaStream_t stream = streams[chunk];
-
-    // Async copy input chunk
-    cudaMemcpyAsync(&d_input[offset], &h_input[offset],
-                   chunk_size * sizeof(float),
-                   cudaMemcpyHostToDevice, stream);
-
-    // Process chunk
-    complex_processing_kernel<<<(chunk_size+255)/256, 256, 0, stream>>>(
-        &d_input[offset], &d_output[offset], chunk_size);
-
-    // Async copy output chunk
-    cudaMemcpyAsync(&h_output[offset], &d_output[offset],
-                   chunk_size * sizeof(float),
-                   cudaMemcpyDeviceToHost, stream);
-}
-```
+1. **Sequential Processing (No Overlap)**: Operations are serialized.
+2. **Chunked Processing (With Overlap)**: Data is split into chunks, processed in different streams to allow H2D, Kernel, and D2H overlap.
+3. **Pipeline Processing**: More advanced orchestration.
 
 ## Stream Synchronization Mechanisms
 
-Synchronizing streams is crucial for ensuring data integrity and coordinating dependencies.
+### Comprehensive Synchronization Patterns
 
-### Synchronization Primitives
-1.  `cudaStreamSynchronize(stream)`: Host waits for a specific stream.
-2.  `cudaDeviceSynchronize()`: Host waits for all streams (heavyweight).
-3.  `cudaStreamWaitEvent(stream, event)`: Make a stream wait for an event (GPU-side sync, no host blocking).
+The `StreamSynchronizer` class demonstrates advanced synchronization techniques like barrier synchronization, producer-consumer sync, and fork-join patterns.
 
-### StreamSynchronizer Implementation
-
-The `StreamSynchronizer` class provides patterns for:
-*   Barrier synchronization
-*   Producer-consumer sync
-*   Fork-join patterns
-*   Pipeline stage synchronization
-
-> **Full Implementation**: [`src/04_streams_concurrency/StreamSynchronizer.cuh`](../src/04_streams_concurrency/StreamSynchronizer.cuh)
+**Source Code**: [`../src/04_streams_concurrency/stream_synchronizer.cuh`](../src/04_streams_concurrency/stream_synchronizer.cuh)
 
 ```cpp
-#include "../src/04_streams_concurrency/StreamSynchronizer.cuh"
+#include "../src/04_streams_concurrency/stream_synchronizer.cuh"
 
-void demonstrate_sync_patterns() {
+// Example usage
+void demonstrate_sync() {
     StreamSynchronizer sync(4);
 
-    // Example: Fork-Join
-    std::vector<int> workers = {1, 2, 3};
-    sync.fork_join_pattern(workers, 0);
+    // Barrier sync
+    sync.barrier_sync();
+
+    // Fork-Join
+    std::vector<int> parallel_streams = {1, 2};
+    sync.fork_join_pattern(parallel_streams, 3);
 }
 ```
 
 ## Dynamic Stream Management
 
-For workloads with varying intensity, allocating streams dynamically can improve resource utilization.
+### Adaptive Stream Allocation
 
-### AdaptiveStreamManager Implementation
+For varying workloads, an `AdaptiveStreamManager` can dynamically create and manage streams based on utilization.
 
-The `AdaptiveStreamManager` handles:
-*   Dynamic creation/destruction of streams
-*   Utilization tracking
-*   Load-based scaling
-
-> **Full Implementation**: [`src/04_streams_concurrency/AdaptiveStreamManager.cuh`](../src/04_streams_concurrency/AdaptiveStreamManager.cuh)
+**Source Code**: [`../src/04_streams_concurrency/adaptive_stream_manager.cuh`](../src/04_streams_concurrency/adaptive_stream_manager.cuh)
 
 ```cpp
-#include "../src/04_streams_concurrency/AdaptiveStreamManager.cuh"
+#include "../src/04_streams_concurrency/adaptive_stream_manager.cuh"
 
-void demonstrate_adaptive_streams() {
-    AdaptiveStreamManager manager(4, 0.8f);
-
-    // Get a stream based on current load
+void demonstrate_adaptive() {
+    AdaptiveStreamManager manager;
     int stream_id = manager.acquire_stream();
     cudaStream_t stream = manager.get_cuda_stream(stream_id);
 
     // Use stream...
 
     manager.release_stream(stream_id);
-    manager.optimize_stream_count(); // Scale up/down
+    manager.optimize_stream_count();
 }
 ```

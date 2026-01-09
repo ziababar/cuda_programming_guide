@@ -1,12 +1,14 @@
-#pragma once
-#include "graph_manager.cuh"
+#ifndef ADVANCED_GRAPH_PATTERNS_CUH
+#define ADVANCED_GRAPH_PATTERNS_CUH
+
+#include <string>
 #include <map>
 #include <vector>
-#include <string>
 #include <cstdio>
-#include <cmath>
+#include <cuda_runtime.h>
+#include "graph_manager.cuh"
 
-// Forward declare kernels
+// Forward declaration of kernels
 __global__ void parameterized_kernel(float* input, float* output, int N, float scale);
 __global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id);
 __global__ void combine_results_kernel(float* input1, float* input2, float* output, int N);
@@ -275,3 +277,5 @@ public:
         cudaFree(d_output);
     }
 };
+
+#endif // ADVANCED_GRAPH_PATTERNS_CUH

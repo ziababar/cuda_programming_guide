@@ -1,17 +1,20 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef ADAPTIVE_STREAM_BALANCER_CUH
+#define ADAPTIVE_STREAM_BALANCER_CUH
+
 #include <vector>
 #include <string>
-#include <functional>
 #include <queue>
 #include <mutex>
 #include <condition_variable>
 #include <atomic>
 #include <chrono>
-#include <cstdio>
 #include <numeric>
-#include <thread>
 #include <algorithm>
+#include <limits>
+#include <functional>
+#include <thread>
+#include <cstdio>
+#include <cuda_runtime.h>
 
 // Dynamic load balancing across multiple streams
 class AdaptiveStreamBalancer {
@@ -378,3 +381,5 @@ public:
         printf("Final statistics: %d tasks completed\n", total_completed_tasks.load());
     }
 };
+
+#endif // ADAPTIVE_STREAM_BALANCER_CUH

@@ -1,7 +1,9 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef BANDWIDTH_OPTIMIZER_CUH
+#define BANDWIDTH_OPTIMIZER_CUH
+
 #include <vector>
 #include <cstdio>
+#include <cuda_runtime.h>
 
 // Comprehensive bandwidth optimization techniques
 class BandwidthOptimizer {
@@ -169,8 +171,8 @@ private:
         return total_bandwidth;
     }
 };
-<<<<<<< HEAD
 
 #endif // BANDWIDTH_OPTIMIZER_CUH
-=======
->>>>>>> main
+
+#endif // BANDWIDTH_OPTIMIZER_CUH
+
