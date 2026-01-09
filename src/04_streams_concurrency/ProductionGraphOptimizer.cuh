@@ -1,17 +1,17 @@
-#pragma once
-#include "GraphManager.cuh"
-#include <cuda_runtime.h>
+#ifndef PRODUCTION_GRAPH_OPTIMIZER_CUH
+#define PRODUCTION_GRAPH_OPTIMIZER_CUH
+
+#include <map>
 #include <vector>
 #include <string>
-#include <map>
 #include <cstdio>
+#include <limits>
 #include <algorithm>
 #include <cmath>
-#include <limits>
-#include <numeric>
+#include "GraphManager.cuh"
 
-// Forward declaration of kernel
-__global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id);
+// Forward declaration
+inline __global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id);
 
 // Production-ready graph optimization and management
 class ProductionGraphOptimizer {
@@ -296,7 +296,7 @@ public:
     }
 };
 
-__global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id) {
+inline __global__ void batched_operation_kernel(float* input, float* output, int N, int operation_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (tid < N) {
@@ -321,3 +321,5 @@ __global__ void batched_operation_kernel(float* input, float* output, int N, int
         output[tid] = value;
     }
 }
+
+#endif // PRODUCTION_GRAPH_OPTIMIZER_CUH

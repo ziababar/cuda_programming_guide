@@ -1,16 +1,16 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_PIPELINE_CUH
+#define STREAM_PIPELINE_CUH
+
 #include <vector>
 #include <string>
 #include <functional>
 #include <cstdio>
-#include <cmath>
 
-// Forward declarations of kernels
-__global__ void pipeline_preprocess_kernel(float* input, float* output, int N);
-__global__ void pipeline_compute_kernel(float* input, float* output, int N);
-__global__ void pipeline_postprocess_kernel(float* input, float* output, int N);
-__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id);
+// Forward declarations
+inline __global__ void pipeline_preprocess_kernel(float* input, float* output, int N);
+inline __global__ void pipeline_compute_kernel(float* input, float* output, int N);
+inline __global__ void pipeline_postprocess_kernel(float* input, float* output, int N);
+inline __global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id);
 
 // Sophisticated multi-stage pipeline with dynamic load balancing
 class StreamPipeline {
@@ -19,16 +19,17 @@ private:
         std::string name;
         cudaStream_t stream;
         std::function<void(float*, float*, int, cudaStream_t)> process_func;
-        float* input_buffer;
-        float* output_buffer;
-        cudaEvent_t stage_complete;
+        // In overlapped mode, we need buffers per batch
+        // We'll manage buffers dynamically or use a pool
         int buffer_size;
         float avg_processing_time;
         int completed_batches;
+        cudaEvent_t stage_complete;
     };
 
     std::vector<PipelineStage> stages;
-    std::vector<float*> intermediate_buffers;
+    // Pool of intermediate buffers: [batch_id][stage_id] -> buffer
+    std::vector<std::vector<float*>> batch_intermediate_buffers;
     int num_stages;
     int buffer_elements;
     bool is_initialized;
@@ -42,13 +43,6 @@ public:
                num_stages, buffer_elements);
 
         stages.resize(num_stages);
-        intermediate_buffers.resize(num_stages + 1);
-
-        // Allocate intermediate buffers
-        for (int i = 0; i <= num_stages; i++) {
-            cudaMalloc(&intermediate_buffers[i], buffer_elements * sizeof(float));
-            printf("Allocated buffer %d: %p\n", i, intermediate_buffers[i]);
-        }
 
         // Initialize pipeline stages
         for (int i = 0; i < num_stages; i++) {
@@ -58,20 +52,33 @@ public:
             cudaStreamCreate(&stage.stream);
             cudaEventCreate(&stage.stage_complete);
 
-            stage.input_buffer = intermediate_buffers[i];
-            stage.output_buffer = intermediate_buffers[i + 1];
             stage.buffer_size = buffer_elements;
             stage.avg_processing_time = 0.0f;
             stage.completed_batches = 0;
 
-            printf("Initialized %s: input=%p, output=%p\n",
-                   stage.name.c_str(), stage.input_buffer, stage.output_buffer);
+            printf("Initialized %s\n", stage.name.c_str());
         }
 
         setup_default_processing_functions();
         is_initialized = true;
 
         printf("StreamPipeline initialization complete\n");
+    }
+
+    // Allocate buffers for a batch (input + intermediates + output for last stage)
+    // Actually, pipeline usually transforms input -> buffer1 -> buffer2 -> ... -> output
+    // We need num_stages + 1 buffers if we consider input/output external,
+    // or num_stages - 1 intermediate buffers.
+    // Let's stick to the previous model: intermediate_buffers was size num_stages+1
+    // where 0 is input copy dest, and num_stages is output copy src.
+    void allocate_batch_buffers(int num_batches) {
+        batch_intermediate_buffers.resize(num_batches);
+        for(int b = 0; b < num_batches; ++b) {
+            batch_intermediate_buffers[b].resize(num_stages + 1);
+            for(int i = 0; i <= num_stages; ++i) {
+                cudaMalloc(&batch_intermediate_buffers[b][i], buffer_elements * sizeof(float));
+            }
+        }
     }
 
     // Set custom processing function for a stage
@@ -93,7 +100,7 @@ public:
                stage_id, stages[stage_id].name.c_str());
     }
 
-    // Execute pipeline on input data
+    // Execute pipeline on input data (Single batch mode)
     void execute_pipeline(float* input_data, float* output_data,
                          bool measure_performance = true) {
         if (!is_initialized) {
@@ -101,10 +108,17 @@ public:
             return;
         }
 
+        // For single execution, use a temporary set of buffers or check if we have any
+        if (batch_intermediate_buffers.empty()) {
+            allocate_batch_buffers(1);
+        }
+
+        auto& buffers = batch_intermediate_buffers[0];
+
         printf("=== Executing Pipeline ===\n");
 
         // Copy input data to first buffer
-        cudaMemcpy(intermediate_buffers[0], input_data,
+        cudaMemcpy(buffers[0], input_data,
                   buffer_elements * sizeof(float), cudaMemcpyHostToDevice);
 
         std::vector<cudaEvent_t> stage_timers;
@@ -131,8 +145,8 @@ public:
                 cudaEventRecord(stage_timers[i*2], stage.stream);
             }
 
-            // Execute stage processing
-            stage.process_func(stage.input_buffer, stage.output_buffer,
+            // Execute stage processing using the specific buffers for this run
+            stage.process_func(buffers[i], buffers[i+1],
                              stage.buffer_size, stage.stream);
 
             // Record completion event
@@ -146,7 +160,7 @@ public:
 
         // Wait for final stage and copy result
         cudaStreamSynchronize(stages[num_stages-1].stream);
-        cudaMemcpy(output_data, intermediate_buffers[num_stages],
+        cudaMemcpy(output_data, buffers[num_stages],
                   buffer_elements * sizeof(float), cudaMemcpyDeviceToHost);
 
         // Process performance measurements
@@ -193,6 +207,17 @@ public:
             return;
         }
 
+        // Ensure we have enough buffer sets for the batches
+        if (batch_intermediate_buffers.size() < num_batches) {
+             // Free existing if any to resize cleanly, or just append
+             // For simplicity, reallocate all to match needed batches (demo code)
+             for(auto& vec : batch_intermediate_buffers) {
+                 for(auto* ptr : vec) cudaFree(ptr);
+             }
+             batch_intermediate_buffers.clear();
+             allocate_batch_buffers(num_batches);
+        }
+
         // Overlapped execution for maximum throughput
         cudaEvent_t batch_start, batch_end;
         cudaEventCreate(&batch_start);
@@ -203,8 +228,10 @@ public:
         for (int batch = 0; batch < num_batches; batch++) {
             printf("Starting batch %d/%d\n", batch + 1, num_batches);
 
+            auto& buffers = batch_intermediate_buffers[batch];
+
             // Copy input data asynchronously
-            cudaMemcpyAsync(intermediate_buffers[0], input_batches[batch],
+            cudaMemcpyAsync(buffers[0], input_batches[batch],
                            buffer_elements * sizeof(float),
                            cudaMemcpyHostToDevice, stages[0].stream);
 
@@ -212,21 +239,50 @@ public:
             for (int i = 0; i < num_stages; i++) {
                 PipelineStage& stage = stages[i];
 
-                // Wait for previous stage
+                // Wait for previous stage OF THIS BATCH
+                // Note: In a pipeline, Stage[i] of Batch[k] depends on Stage[i-1] of Batch[k].
+                // But Stage[i] also effectively shares the compute resource (stream) with Stage[i] of Batch[k-1].
+                // The stream FIFO order handles resource serialization.
+                // We mainly need to ensure data dependency: Stage[i] waits for input buffer (buffers[i]) to be ready.
+                // buffers[i] is produced by Stage[i-1].
+
                 if (i > 0) {
-                    cudaStreamWaitEvent(stage.stream, stages[i-1].stage_complete, 0);
+                    // This wait is tricky. stages[i-1].stage_complete tracks the completion of Stage[i-1] for the *previous* command issued to it.
+                    // But here we are issuing commands in a loop.
+                    // Ideally, we record an event for *this specific batch's* previous stage completion.
+                    // However, since everything for one batch is issued in sequence, and streams are separate:
+                    // If Stage[i-1] runs on Stream[i-1], and Stage[i] runs on Stream[i].
+                    // We need Stream[i] to wait for Stream[i-1] to finish writing to buffers[i].
+
+                    // We need an event specific to this batch's stage completion.
+                    // Or, we can use the stream semantics:
+                    // Since we are issuing batch 0, then batch 1...
+                    // The 'stage_complete' event in the struct is reused. This is dangerous if loop is tight.
+                    // BUT: We issue all stages for Batch K. Then all stages for Batch K+1.
+                    // When we are at Batch K, Stage i:
+                    // We record an event on Stream i-1 (after Stage i-1 work).
+                    // We wait on Stream i for that event.
+
+                    // To do this correctly without per-batch events, we need to create temp events or manage them.
+                    // For this demo, let's create a temporary event for dependency.
+
+                    cudaEvent_t dependency_event;
+                    cudaEventCreate(&dependency_event);
+                    cudaEventRecord(dependency_event, stages[i-1].stream);
+                    cudaStreamWaitEvent(stage.stream, dependency_event, 0);
+                    cudaEventDestroy(dependency_event);
                 }
 
                 // Execute processing
-                stage.process_func(stage.input_buffer, stage.output_buffer,
+                stage.process_func(buffers[i], buffers[i+1],
                                  stage.buffer_size, stage.stream);
 
-                // Record completion
+                // Record completion (global stage progress)
                 cudaEventRecord(stage.stage_complete, stage.stream);
             }
 
             // Copy output data asynchronously
-            cudaMemcpyAsync(output_batches[batch], intermediate_buffers[num_stages],
+            cudaMemcpyAsync(output_batches[batch], buffers[num_stages],
                            buffer_elements * sizeof(float),
                            cudaMemcpyDeviceToHost, stages[num_stages-1].stream);
         }
@@ -368,15 +424,64 @@ public:
         }
 
         // Cleanup buffers
-        for (auto buffer : intermediate_buffers) {
-            cudaFree(buffer);
+        for (auto& vec : batch_intermediate_buffers) {
+            for (auto* ptr : vec) {
+                cudaFree(ptr);
+            }
         }
 
         printf("StreamPipeline cleanup complete\n");
     }
 };
 
-__global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
+// Demonstrate advanced pipeline patterns
+inline void demonstrate_pipeline_patterns() {
+    printf("=== Pipeline Patterns Demonstration ===\n");
+
+    const int buffer_size = 1024 * 1024; // 1M elements
+    const int num_batches = 5;
+
+    // Create pipeline with 4 stages
+    StreamPipeline pipeline(4, buffer_size);
+
+    // Prepare test data
+    std::vector<float*> input_batches(num_batches);
+    std::vector<float*> output_batches(num_batches);
+
+    for (int i = 0; i < num_batches; i++) {
+        input_batches[i] = new float[buffer_size];
+        output_batches[i] = new float[buffer_size];
+
+        // Initialize input data
+        for (int j = 0; j < buffer_size; j++) {
+            input_batches[i][j] = i * 1000.0f + j * 0.001f;
+        }
+    }
+
+    printf("\n1. Single Pipeline Execution:\n");
+    pipeline.execute_pipeline(input_batches[0], output_batches[0], true);
+
+    printf("\n2. Sequential Batch Processing:\n");
+    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
+                                    num_batches, false);
+
+    printf("\n3. Overlapped Batch Processing:\n");
+    pipeline.execute_batched_pipeline(input_batches.data(), output_batches.data(),
+                                    num_batches, true);
+
+    printf("\n4. Pipeline Analysis:\n");
+    pipeline.print_pipeline_statistics();
+    pipeline.analyze_pipeline_bottlenecks();
+
+    // Cleanup
+    for (int i = 0; i < num_batches; i++) {
+        delete[] input_batches[i];
+        delete[] output_batches[i];
+    }
+}
+
+// Pipeline kernel implementations
+inline __global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         // Normalization and basic preprocessing
@@ -384,7 +489,7 @@ __global__ void pipeline_preprocess_kernel(float* input, float* output, int N) {
     }
 }
 
-__global__ void pipeline_compute_kernel(float* input, float* output, int N) {
+inline __global__ void pipeline_compute_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         // Main computation - complex mathematical operations
@@ -396,7 +501,7 @@ __global__ void pipeline_compute_kernel(float* input, float* output, int N) {
     }
 }
 
-__global__ void pipeline_postprocess_kernel(float* input, float* output, int N) {
+inline __global__ void pipeline_postprocess_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         // Post-processing - scaling and clamping
@@ -405,10 +510,12 @@ __global__ void pipeline_postprocess_kernel(float* input, float* output, int N) 
     }
 }
 
-__global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id) {
+inline __global__ void pipeline_generic_kernel(float* input, float* output, int N, int stage_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         // Generic processing based on stage ID
         output[tid] = input[tid] * (stage_id + 1) + 0.1f;
     }
 }
+
+#endif // STREAM_PIPELINE_CUH

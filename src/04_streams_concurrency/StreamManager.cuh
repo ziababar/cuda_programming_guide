@@ -1,10 +1,16 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_MANAGER_CUH
+#define STREAM_MANAGER_CUH
+
 #include <vector>
 #include <string>
-#include <cstdio>
 #include <algorithm>
-#include <map>
+#include <cstdio>
+#include <iostream>
+
+// Forward declarations
+inline __global__ void preprocessing_kernel(float* data, int N);
+inline __global__ void processing_kernel(float* data, int N);
+inline __global__ void compute_intensive_kernel(float* data, int N);
 
 // Sophisticated stream management for production applications
 class StreamManager {
@@ -176,3 +182,48 @@ public:
         printf("StreamManager cleanup complete\n");
     }
 };
+
+// Usage example
+inline void demonstrate_stream_manager() {
+    printf("=== Stream Manager Demo ===\n");
+
+    // Create manager with priority streams and custom tags
+    std::vector<std::string> tags = {"MemoryOps", "Compute", "HighPrio", "Background"};
+    StreamManager manager(4, true, tags);
+
+    // Simulate different workload assignments
+    const int N = 1024 * 1024;
+    float *d_data1, *d_data2, *d_data3, *d_data4;
+
+    cudaMalloc(&d_data1, N * sizeof(float));
+    cudaMalloc(&d_data2, N * sizeof(float));
+    cudaMalloc(&d_data3, N * sizeof(float));
+    cudaMalloc(&d_data4, N * sizeof(float));
+
+    // Assign workloads to appropriate streams
+    cudaStream_t memory_stream = manager.get_stream_for_workload("memory_intensive");
+    cudaStream_t compute_stream = manager.get_stream_for_workload("compute_intensive");
+    cudaStream_t priority_stream = manager.get_stream_for_workload("high_priority");
+    cudaStream_t background_stream = manager.get_next_stream();
+
+    // Launch operations
+    cudaMemsetAsync(d_data1, 0, N * sizeof(float), memory_stream);
+    compute_intensive_kernel<<<(N+255)/256, 256, 0, compute_stream>>>(d_data2, N);
+    preprocessing_kernel<<<(N+255)/256, 256, 0, priority_stream>>>(d_data3, N);
+    processing_kernel<<<(N+255)/256, 256, 0, background_stream>>>(d_data4, N);
+
+    // Check status
+    manager.print_status();
+
+    // Synchronize and get final status
+    manager.synchronize_all();
+    manager.print_performance_stats();
+
+    // Cleanup
+    cudaFree(d_data1);
+    cudaFree(d_data2);
+    cudaFree(d_data3);
+    cudaFree(d_data4);
+}
+
+#endif // STREAM_MANAGER_CUH

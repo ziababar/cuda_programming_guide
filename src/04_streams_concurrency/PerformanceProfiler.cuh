@@ -1,17 +1,17 @@
-#pragma once
-#include <cuda_runtime.h>
-#include <vector>
-#include <string>
-#include <map>
-#include <chrono>
-#include <cstdio>
-#include <algorithm>
-#include <cmath>
-#include <functional>
+#ifndef PERFORMANCE_PROFILER_CUH
+#define PERFORMANCE_PROFILER_CUH
 
-// Forward declarations for kernels used in the class
-__global__ void complex_math_kernel(float* input, float* output, int N);
-__global__ void simple_math_kernel(float* input, float* output, int N);
+#include <string>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <functional>
+#include <cmath>
+#include <cstdio>
+
+// Forward declarations
+inline __global__ void complex_math_kernel(float* input, float* output, int N);
+inline __global__ void simple_math_kernel(float* input, float* output, int N);
 
 // Sophisticated timing system using CUDA events
 class PerformanceProfiler {
@@ -218,7 +218,107 @@ public:
     }
 };
 
-__global__ void complex_math_kernel(float* input, float* output, int N) {
+// Comprehensive timing demonstration
+inline void demonstrate_performance_profiling() {
+    printf("=== Performance Profiling Demonstration ===\n");
+
+    PerformanceProfiler profiler;
+
+    // Create test data
+    const int N = 2 * 1024 * 1024; // 2M elements
+    float *h_data, *d_input, *d_output, *d_temp;
+
+    cudaHostAlloc(&h_data, N * sizeof(float), cudaHostAllocDefault);
+    cudaMalloc(&d_input, N * sizeof(float));
+    cudaMalloc(&d_output, N * sizeof(float));
+    cudaMalloc(&d_temp, N * sizeof(float));
+
+    // Initialize data
+    for (int i = 0; i < N; i++) {
+        h_data[i] = sin(i * 0.001f);
+    }
+
+    // Create streams
+    cudaStream_t stream1, stream2;
+    cudaStreamCreate(&stream1);
+    cudaStreamCreate(&stream2);
+
+    printf("\n1. Basic Operation Timing:\n");
+
+    // Time memory transfer
+    profiler.start_timing("memory_h2d");
+    cudaMemcpy(d_input, h_data, N * sizeof(float), cudaMemcpyHostToDevice);
+    profiler.stop_timing("memory_h2d");
+
+    // Time kernel execution
+    profiler.start_timing("kernel_execution");
+    complex_math_kernel<<<(N+255)/256, 256>>>(d_input, d_output, N);
+    profiler.stop_timing("kernel_execution");
+
+    // Time memory transfer back
+    profiler.start_timing("memory_d2h");
+    cudaMemcpy(h_data, d_output, N * sizeof(float), cudaMemcpyDeviceToHost);
+    profiler.stop_timing("memory_d2h");
+
+    printf("\n2. Scope-Based Timing (RAII):\n");
+    {
+        auto timer = profiler.time_scope("scoped_operation");
+
+        // Complex operation
+        cudaMemcpy(d_input, h_data, N * sizeof(float), cudaMemcpyHostToDevice);
+        complex_math_kernel<<<(N+255)/256, 256>>>(d_input, d_temp, N);
+        simple_math_kernel<<<(N+255)/256, 256>>>(d_temp, d_output, N);
+        cudaMemcpy(h_data, d_output, N * sizeof(float), cudaMemcpyDeviceToHost);
+
+        // Timer automatically stops when scope ends
+    }
+
+    printf("\n3. Benchmarking Operations:\n");
+
+    // Benchmark different kernel configurations
+    profiler.benchmark_operation("kernel_256_threads", [&]() {
+        complex_math_kernel<<<(N+255)/256, 256>>>(d_input, d_output, N);
+        cudaDeviceSynchronize();
+    }, 5);
+
+    profiler.benchmark_operation("kernel_512_threads", [&]() {
+        complex_math_kernel<<<(N+511)/512, 512>>>(d_input, d_output, N);
+        cudaDeviceSynchronize();
+    }, 5);
+
+    profiler.benchmark_operation("kernel_1024_threads", [&]() {
+        complex_math_kernel<<<(N+1023)/1024, 1024>>>(d_input, d_output, N);
+        cudaDeviceSynchronize();
+    }, 5);
+
+    printf("\n4. Pipeline Timing:\n");
+
+    // Time overlapped operations
+    profiler.start_timing("overlapped_pipeline");
+
+    cudaMemcpyAsync(d_input, h_data, N * sizeof(float), cudaMemcpyHostToDevice, stream1);
+    complex_math_kernel<<<(N+255)/256, 256, 0, stream1>>>(d_input, d_temp, N);
+    simple_math_kernel<<<(N+255)/256, 256, 0, stream2>>>(d_temp, d_output, N);
+    cudaMemcpyAsync(h_data, d_output, N * sizeof(float), cudaMemcpyDeviceToHost, stream2);
+
+    cudaStreamSynchronize(stream1);
+    cudaStreamSynchronize(stream2);
+
+    profiler.stop_timing("overlapped_pipeline");
+
+    // Print comprehensive results
+    profiler.print_all_stats();
+
+    // Cleanup
+    cudaStreamDestroy(stream1);
+    cudaStreamDestroy(stream2);
+    cudaFreeHost(h_data);
+    cudaFree(d_input);
+    cudaFree(d_output);
+    cudaFree(d_temp);
+}
+
+inline __global__ void complex_math_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (tid < N) {
@@ -235,10 +335,12 @@ __global__ void complex_math_kernel(float* input, float* output, int N) {
     }
 }
 
-__global__ void simple_math_kernel(float* input, float* output, int N) {
+inline __global__ void simple_math_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (tid < N) {
         output[tid] = input[tid] * 2.0f + 1.0f;
     }
 }
+
+#endif // PERFORMANCE_PROFILER_CUH

@@ -2,26 +2,34 @@
 
 Beyond basic stream operations, CUDA enables sophisticated coordination patterns that maximize GPU utilization through complex producer-consumer relationships, pipeline architectures, and dynamic load balancing strategies.
 
+**[Back to Streams & Concurrency Index](1_cuda_streams_concurrency.md)**
+
+---
+
 ## Producer-Consumer Patterns
+
+Producer-consumer patterns enable efficient data flow management where different components generate and consume data at potentially different rates, requiring sophisticated buffering and synchronization strategies.
 
 ### Multi-Buffer Producer-Consumer System
 
-The `StreamProducerConsumer` class implements a ring-buffer based producer-consumer system where a producer thread fills buffers and a consumer thread processes them on the GPU, using events for synchronization.
-
-**Source Code**: [`../src/04_streams_concurrency/stream_producer_consumer.cuh`](../src/04_streams_concurrency/stream_producer_consumer.cuh)
+**Code Example:** [`StreamProducerConsumer.cuh`](../src/04_streams_concurrency/StreamProducerConsumer.cuh)
 
 ## Pipeline Architecture Patterns
 
+Stream-based pipelines enable complex multi-stage processing where each stage can operate independently and concurrently, maximizing GPU utilization and throughput.
+
 ### Multi-Stage Processing Pipeline
 
-The `StreamPipeline` class implements a multi-stage pipeline where each stage runs in its own stream, with dependencies handled via events.
-
-**Source Code**: [`../src/04_streams_concurrency/stream_pipeline.cuh`](../src/04_streams_concurrency/stream_pipeline.cuh)
+**Code Example:** [`StreamPipeline.cuh`](../src/04_streams_concurrency/StreamPipeline.cuh)
 
 ## Dynamic Load Balancing
 
+Advanced stream patterns can dynamically distribute work across multiple streams based on real-time performance characteristics and system load.
+
 ### Adaptive Stream Load Balancer
 
-The `AdaptiveStreamBalancer` class distributes tasks across a pool of worker streams, monitoring their load and processing time to make optimal scheduling decisions.
+**Code Example:** [`AdaptiveStreamBalancer.cuh`](../src/04_streams_concurrency/AdaptiveStreamBalancer.cuh)
 
-**Source Code**: [`../src/04_streams_concurrency/adaptive_stream_balancer.cuh`](../src/04_streams_concurrency/adaptive_stream_balancer.cuh)
+## Production Patterns
+
+(This section is integrated into the advanced patterns above)

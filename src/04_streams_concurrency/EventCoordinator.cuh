@@ -1,13 +1,21 @@
-#pragma once
-#include <cuda_runtime.h>
-#include <vector>
+#ifndef EVENT_COORDINATOR_CUH
+#define EVENT_COORDINATOR_CUH
+
 #include <string>
-#include <queue>
+#include <vector>
 #include <map>
+#include <queue>
 #include <functional>
+#include <thread>
+#include <chrono>
 #include <cstdio>
 #include <algorithm>
-#include <thread>
+
+// Forward declarations
+inline __global__ void initialization_kernel(float* data, int N);
+inline __global__ void combine_kernel(float* data1, float* data2, float* output, int N);
+inline __global__ void complex_math_kernel(float* input, float* output, int N);
+inline __global__ void simple_math_kernel(float* input, float* output, int N);
 
 // Complex event-driven coordination system
 class EventCoordinator {
@@ -212,3 +220,93 @@ public:
         printf("EventCoordinator cleanup complete\n");
     }
 };
+
+// Demonstrate complex event-driven coordination
+inline void demonstrate_event_coordination() {
+    printf("=== Event-Driven Coordination Demo ===\n");
+
+    // Create streams
+    std::vector<cudaStream_t> streams(4);
+    for (auto& stream : streams) {
+        cudaStreamCreate(&stream);
+    }
+
+    EventCoordinator coordinator(streams);
+
+    // Create test data
+    const int N = 1024 * 1024;
+    float *d_data1, *d_data2, *d_data3, *d_data4, *d_temp;
+
+    cudaMalloc(&d_data1, N * sizeof(float));
+    cudaMalloc(&d_data2, N * sizeof(float));
+    cudaMalloc(&d_data3, N * sizeof(float));
+    cudaMalloc(&d_data4, N * sizeof(float));
+    cudaMalloc(&d_temp, N * sizeof(float));
+
+    // Define work functions
+    auto init_data = [=](cudaStream_t stream) {
+        cudaMemsetAsync(d_data1, 0, N * sizeof(float), stream);
+        initialization_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data1, N);
+    };
+
+    auto process_stage1 = [=](cudaStream_t stream) {
+        complex_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data1, d_data2, N);
+    };
+
+    auto process_stage2a = [=](cudaStream_t stream) {
+        simple_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data2, d_data3, N);
+    };
+
+    auto process_stage2b = [=](cudaStream_t stream) {
+        complex_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data2, d_temp, N);
+    };
+
+    auto final_combine = [=](cudaStream_t stream) {
+        combine_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data3, d_temp, d_data4, N);
+    };
+
+    // Build dependency graph
+    // Stage 0: Initialize data
+    coordinator.add_node("initialize", {}, init_data);
+
+    // Stage 1: Process initial data (depends on initialize)
+    coordinator.add_node("stage1", {"initialize"}, process_stage1);
+
+    // Stage 2: Parallel processing (both depend on stage1)
+    coordinator.add_node("stage2a", {"stage1"}, process_stage2a);
+    coordinator.add_node("stage2b", {"stage1"}, process_stage2b);
+
+    // Stage 3: Combine results (depends on both stage2a and stage2b)
+    coordinator.add_node("combine", {"stage2a", "stage2b"}, final_combine);
+
+    // Print graph structure
+    coordinator.print_graph_structure();
+
+    // Execute the graph
+    auto start_time = std::chrono::high_resolution_clock::now();
+    coordinator.execute_graph();
+    auto end_time = std::chrono::high_resolution_clock::now();
+
+    auto execution_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+    printf("Total graph execution time: %ld ms\n", execution_time.count());
+
+    // Cleanup
+    for (auto& stream : streams) {
+        cudaStreamDestroy(stream);
+    }
+
+    cudaFree(d_data1);
+    cudaFree(d_data2);
+    cudaFree(d_data3);
+    cudaFree(d_data4);
+    cudaFree(d_temp);
+}
+
+inline __global__ void combine_kernel(float* data1, float* data2, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = (data1[tid] + data2[tid]) * 0.5f;
+    }
+}
+
+#endif // EVENT_COORDINATOR_CUH

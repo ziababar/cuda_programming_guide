@@ -1,10 +1,12 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef BIDIRECTIONAL_TRANSFER_MANAGER_CUH
+#define BIDIRECTIONAL_TRANSFER_MANAGER_CUH
+
 #include <vector>
 #include <cstdio>
 #include <cmath>
 
-__global__ void bidirectional_compute_kernel(float* data, int N, int iteration);
+// Forward declaration
+inline __global__ void bidirectional_compute_kernel(float* data, int N, int iteration);
 
 // Sophisticated bidirectional transfer patterns
 class BidirectionalTransferManager {
@@ -235,7 +237,7 @@ public:
     }
 };
 
-__global__ void bidirectional_compute_kernel(float* data, int N, int iteration) {
+inline __global__ void bidirectional_compute_kernel(float* data, int N, int iteration) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (tid < N) {
@@ -249,3 +251,5 @@ __global__ void bidirectional_compute_kernel(float* data, int N, int iteration) 
         data[tid] = value;
     }
 }
+
+#endif // BIDIRECTIONAL_TRANSFER_MANAGER_CUH

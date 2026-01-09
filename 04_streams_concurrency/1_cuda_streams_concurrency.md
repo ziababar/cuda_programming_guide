@@ -1,4 +1,4 @@
-# CUDA Streams & Concurrency Complete Guide
+# CUDA Streams & Concurrency
 
 CUDA streams are the backbone of high-performance GPU programming, enabling asynchronous execution, memory transfer overlap, and sophisticated pipeline orchestration. Understanding streams deeply is essential for achieving optimal GPU utilization and building scalable parallel applications.
 
@@ -11,31 +11,31 @@ CUDA streams are the backbone of high-performance GPU programming, enabling asyn
 1. **[Stream Fundamentals](1_stream_fundamentals.md)**
    - Stream Types and Properties
    - Stream Execution Model
-   - Stream Management Patterns
+   - Nsight Debugging Tips
 
 2. **[Asynchronous Operations](2_asynchronous_operations.md)**
    - Compute-Transfer Overlap
-   - Stream Synchronization Mechanisms
-   - Dynamic Stream Management
+   - Advanced Pipeline Processing
+   - Stream Synchronization
 
 3. **[Memory Transfer Optimization](3_memory_transfer.md)**
    - Pinned Memory Deep Dive
-   - Bandwidth Optimization Strategies
-   - Advanced Transfer Patterns
+   - Bandwidth Optimization
+   - Bidirectional Transfers
 
 4. **[Event-Driven Programming](4_event_driven_programming.md)**
-   - Event Fundamentals and Types
-   - Precision Timing and Performance Measurement
-   - Advanced Synchronization Patterns
+   - Event Fundamentals
+   - Precision Timing
+   - Event-Based Coordination
 
 5. **[CUDA Graphs Deep Dive](5_cuda_graphs.md)**
-   - Graph Fundamentals and Architecture
-   - Advanced Graph Patterns and Optimization
-   - Production Graph Optimization Strategies
+   - Graph Fundamentals
+   - Advanced Graph Patterns
+   - Production Graph Optimization
 
 6. **[Advanced Stream Patterns](6_advanced_patterns.md)**
    - Producer-Consumer Patterns
-   - Pipeline Architecture Patterns
+   - Pipeline Architecture
    - Dynamic Load Balancing
 
 ---

@@ -2,38 +2,30 @@
 
 CUDA events provide precise synchronization control and performance measurement capabilities, enabling sophisticated coordination between streams and accurate timing analysis of GPU operations.
 
+**[Back to Streams & Concurrency Index](1_cuda_streams_concurrency.md)**
+
+---
+
 ## Event Fundamentals and Types
 
-CUDA events serve as lightweight synchronization primitives.
+CUDA events serve as lightweight synchronization primitives that can be recorded in streams and waited upon, providing fine-grained control over execution dependencies.
 
 ### Comprehensive Event Management
 
-The `EventManager` class simplifies creating, recording, and synchronizing events with different flags (Default, BlockingSync, DisableTiming, Interprocess).
-
-**Source Code**: [`../src/04_streams_concurrency/event_manager.cuh`](../src/04_streams_concurrency/event_manager.cuh)
+**Code Example:** [`EventManager.cuh`](../src/04_streams_concurrency/EventManager.cuh)
 
 ## Precision Timing and Performance Measurement
 
-Events provide the most accurate method for measuring GPU execution times.
+Events provide the most accurate method for measuring GPU execution times, with sub-millisecond precision and minimal overhead.
 
 ### Advanced Timing Infrastructure
 
-The `PerformanceProfiler` class uses events to measure execution time of regions, supports RAII-style timing guards, and statistical analysis.
-
-**Source Code**: [`../src/04_streams_concurrency/performance_profiler.cuh`](../src/04_streams_concurrency/performance_profiler.cuh)
+**Code Example:** [`PerformanceProfiler.cuh`](../src/04_streams_concurrency/PerformanceProfiler.cuh)
 
 ## Advanced Synchronization Patterns
 
+Events enable sophisticated synchronization patterns beyond basic stream coordination, including complex dependency graphs and multi-stage pipeline coordination.
+
 ### Event-Based Coordination Patterns
 
-The `EventCoordinator` class builds complex dependency graphs using events to coordinate execution across multiple streams.
-
-**Source Code**: [`../src/04_streams_concurrency/event_coordinator.cuh`](../src/04_streams_concurrency/event_coordinator.cuh)
-Events enable complex dependency graphs where streams wait on each other without host intervention.
-
-### Event Coordinator
-The `EventCoordinator` class ([`src/04_streams_concurrency/event_coordinator.cuh`](../src/04_streams_concurrency/event_coordinator.cuh)) demonstrates how to build and execute a dependency graph of tasks.
-- **Nodes**: Work units (kernels).
-- **Dependencies**: Events that must complete before a node starts.
-- **Execution**: The coordinator schedules nodes onto streams as their dependencies are satisfied.
-
+**Code Example:** [`EventCoordinator.cuh`](../src/04_streams_concurrency/EventCoordinator.cuh)

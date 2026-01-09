@@ -1,20 +1,23 @@
-#pragma once
-#include "GraphManager.cuh"
-#include <cuda_runtime.h>
-#include <vector>
+#ifndef ADVANCED_GRAPH_PATTERNS_CUH
+#define ADVANCED_GRAPH_PATTERNS_CUH
+
 #include <string>
+#include <vector>
 #include <map>
 #include <cstdio>
 #include <cmath>
+#include <limits>
+#include <algorithm>
+#include "GraphManager.cuh"
 
-// Forward declarations of kernels
-__global__ void parameterized_kernel(float* input, float* output, int N, float scale);
-__global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id);
-__global__ void combine_results_kernel(float* input1, float* input2, float* output, int N);
-__global__ void preprocessing_kernel(float* input, float* output, int N);
-__global__ void optimized_kernel(float* input, float* output, int N);
-__global__ void standard_kernel(float* input, float* output, int N);
-__global__ void postprocessing_kernel(float* input, float* output, int N);
+// Forward declarations
+inline __global__ void parameterized_kernel(float* input, float* output, int N, float scale);
+inline __global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id);
+inline __global__ void combine_results_kernel(float* input1, float* input2, float* output, int N);
+inline __global__ void preprocessing_kernel(float* input, float* output, int N);
+inline __global__ void optimized_kernel(float* input, float* output, int N);
+inline __global__ void standard_kernel(float* input, float* output, int N);
+inline __global__ void postprocessing_kernel(float* input, float* output, int N);
 
 // Advanced graph patterns for production workloads
 class AdvancedGraphPatterns {
@@ -277,47 +280,69 @@ public:
     }
 };
 
-// Kernel implementations
-__global__ void parameterized_kernel(float* input, float* output, int N, float scale) {
+// Kernel implementations for graph patterns
+inline __global__ void parameterized_kernel(float* input, float* output, int N, float scale) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) output[tid] = input[tid] * scale + sin(tid * 0.001f);
+    if (tid < N) {
+        output[tid] = input[tid] * scale + sin(tid * 0.001f);
+    }
 }
 
-__global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id) {
+inline __global__ void parallel_branch_kernel(float* input, float* output, int N, int branch_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         float value = input[tid];
-        if (branch_id == 1) value = sqrt(fabs(value)) + cos(value);
-        else value = sin(value) + log(fabs(value) + 1.0f);
+
+        // Different processing per branch
+        if (branch_id == 1) {
+            value = sqrt(fabs(value)) + cos(value);
+        } else {
+            value = sin(value) + log(fabs(value) + 1.0f);
+        }
+
         output[tid] = value;
     }
 }
 
-__global__ void combine_results_kernel(float* input1, float* input2, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) output[tid] = (input1[tid] + input2[tid]) * 0.5f;
-}
-
-__global__ void preprocessing_kernel(float* input, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) output[tid] = input[tid] * 2.0f + 1.0f;
-}
-
-__global__ void optimized_kernel(float* input, float* output, int N) {
-    int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) output[tid] = input[tid] + 0.5f;
-}
-
-__global__ void standard_kernel(float* input, float* output, int N) {
+inline __global__ void combine_results_kernel(float* input1, float* input2, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
+        output[tid] = (input1[tid] + input2[tid]) * 0.5f;
+    }
+}
+
+inline __global__ void preprocessing_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        output[tid] = input[tid] * 2.0f + 1.0f;
+    }
+}
+
+inline __global__ void optimized_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Optimized computation (fewer operations)
+        output[tid] = input[tid] + 0.5f;
+    }
+}
+
+inline __global__ void standard_kernel(float* input, float* output, int N) {
+    int tid = threadIdx.x + blockIdx.x * blockDim.x;
+    if (tid < N) {
+        // Standard computation (more operations)
         float value = input[tid];
-        for (int i = 0; i < 10; i++) value = sin(value) + cos(value * 0.1f);
+        for (int i = 0; i < 10; i++) {
+            value = sin(value) + cos(value * 0.1f);
+        }
         output[tid] = value;
     }
 }
 
-__global__ void postprocessing_kernel(float* input, float* output, int N) {
+inline __global__ void postprocessing_kernel(float* input, float* output, int N) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
-    if (tid < N) output[tid] = sqrt(fabs(input[tid]));
+    if (tid < N) {
+        output[tid] = sqrt(fabs(input[tid]));
+    }
 }
+
+#endif // ADVANCED_GRAPH_PATTERNS_CUH

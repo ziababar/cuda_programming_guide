@@ -1,24 +1,27 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef ADAPTIVE_STREAM_BALANCER_CUH
+#define ADAPTIVE_STREAM_BALANCER_CUH
+
 #include <vector>
-#include <string>
 #include <queue>
-#include <map>
-#include <functional>
-#include <cstdio>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include <atomic>
 #include <chrono>
+#include <thread>
+#include <functional>
+#include <string>
+#include <limits>
 #include <numeric>
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
+#include "StreamProducerConsumer.cuh"
+#include "StreamPipeline.cuh"
 
-// Forward declarations of kernels
-__global__ void light_compute_kernel(int task_id);
-__global__ void medium_compute_kernel(int task_id);
-__global__ void heavy_compute_kernel(int task_id);
+// Forward declarations
+inline __global__ void light_compute_kernel(int task_id);
+inline __global__ void medium_compute_kernel(int task_id);
+inline __global__ void heavy_compute_kernel(int task_id);
 
 // Dynamic load balancing across multiple streams
 class AdaptiveStreamBalancer {
@@ -47,6 +50,9 @@ private:
     // Performance monitoring
     std::chrono::high_resolution_clock::time_point start_time;
     float total_processing_time;
+
+    // Thread management
+    std::vector<std::thread> stats_threads;
 
 public:
     AdaptiveStreamBalancer(int num_stream_workers)
@@ -108,10 +114,10 @@ public:
         worker.queued_tasks++;
         total_submitted_tasks++;
 
-        // Schedule statistics update
-        std::thread([this, best_worker, task_start]() {
+        // Schedule statistics update safely
+        stats_threads.emplace_back([this, best_worker, task_start]() {
             update_worker_statistics(best_worker, task_start);
-        }).detach();
+        });
 
         printf("Submitted task %d to %s (load: %.2f)\n",
                task_data, worker.name.c_str(), worker.load_factor);
@@ -146,6 +152,14 @@ public:
         for (auto& worker : workers) {
             cudaStreamSynchronize(worker.stream);
         }
+
+        // Join stats threads
+        for (auto& t : stats_threads) {
+            if (t.joinable()) {
+                t.join();
+            }
+        }
+        stats_threads.clear();
 
         printf("All tasks completed\n");
     }
@@ -386,8 +400,59 @@ public:
     }
 };
 
+// Demonstrate adaptive load balancing
+inline void demonstrate_adaptive_load_balancing() {
+    printf("=== Adaptive Load Balancing Demo ===\n");
+
+    const int num_workers = 4;
+    const int num_tasks = 20;
+
+    AdaptiveStreamBalancer balancer(num_workers);
+
+    // Create various task types with different computational loads
+    std::vector<std::function<void(cudaStream_t, int)>> tasks;
+    std::vector<int> task_data;
+
+    for (int i = 0; i < num_tasks; i++) {
+        task_data.push_back(i);
+
+        // Create tasks with varying computational complexity
+        if (i % 3 == 0) {
+            // Light task
+            tasks.emplace_back([](cudaStream_t stream, int data) {
+                light_compute_kernel<<<64, 64, 0, stream>>>(data);
+            });
+        } else if (i % 3 == 1) {
+            // Medium task
+            tasks.emplace_back([](cudaStream_t stream, int data) {
+                medium_compute_kernel<<<128, 128, 0, stream>>>(data);
+            });
+        } else {
+            // Heavy task
+            tasks.emplace_back([](cudaStream_t stream, int data) {
+                heavy_compute_kernel<<<256, 256, 0, stream>>>(data);
+            });
+        }
+    }
+
+    printf("\n1. Submitting Mixed Workload:\n");
+    balancer.submit_task_batch(tasks, task_data);
+
+    printf("\n2. Monitoring Load During Execution:\n");
+    for (int i = 0; i < 5; i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        balancer.rebalance_load();
+    }
+
+    printf("\n3. Waiting for Completion:\n");
+    balancer.wait_for_completion();
+
+    printf("\n4. Final Statistics:\n");
+    balancer.print_comprehensive_statistics();
+}
+
 // Load balancing kernel implementations
-__global__ void light_compute_kernel(int task_id) {
+inline __global__ void light_compute_kernel(int task_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     // Light computation
@@ -401,7 +466,7 @@ __global__ void light_compute_kernel(int task_id) {
     }
 }
 
-__global__ void medium_compute_kernel(int task_id) {
+inline __global__ void medium_compute_kernel(int task_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     // Medium computation
@@ -415,7 +480,7 @@ __global__ void medium_compute_kernel(int task_id) {
     }
 }
 
-__global__ void heavy_compute_kernel(int task_id) {
+inline __global__ void heavy_compute_kernel(int task_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     // Heavy computation
@@ -429,3 +494,21 @@ __global__ void heavy_compute_kernel(int task_id) {
         printf("Heavy task %d completed (result: %.3f)\n", task_id, result);
     }
 }
+
+// Comprehensive demonstration of advanced stream patterns
+inline void demonstrate_comprehensive_advanced_patterns() {
+    printf("=== Comprehensive Advanced Stream Patterns Demo ===\n");
+
+    printf("\n1. Producer-Consumer Pattern:\n");
+    demonstrate_producer_consumer_pattern();
+
+    printf("\n2. Pipeline Architecture:\n");
+    demonstrate_pipeline_patterns();
+
+    printf("\n3. Adaptive Load Balancing:\n");
+    demonstrate_adaptive_load_balancing();
+
+    printf("\nAdvanced stream patterns demonstration complete!\n");
+}
+
+#endif // ADAPTIVE_STREAM_BALANCER_CUH

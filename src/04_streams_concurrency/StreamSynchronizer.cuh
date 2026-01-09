@@ -1,18 +1,19 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_SYNCHRONIZER_CUH
+#define STREAM_SYNCHRONIZER_CUH
+
 #include <vector>
-#include <string>
 #include <map>
+#include <string>
 #include <cstdio>
 #include <cmath>
 
-// Forward declarations for kernels used in the class
-__global__ void parallel_work_kernel(int stream_id);
-__global__ void join_work_kernel();
-__global__ void pipeline_stage_kernel(int stage, int iteration);
-__global__ void initial_processing_kernel();
-__global__ void parallel_processing_kernel(int branch_id);
-__global__ void aggregation_kernel();
+// Forward declarations
+inline __global__ void parallel_work_kernel(int stream_id);
+inline __global__ void join_work_kernel();
+inline __global__ void pipeline_stage_kernel(int stage, int iteration);
+inline __global__ void initial_processing_kernel();
+inline __global__ void parallel_processing_kernel(int branch_id);
+inline __global__ void aggregation_kernel();
 
 // Advanced synchronization techniques for complex workflows
 class StreamSynchronizer {
@@ -186,41 +187,73 @@ public:
     }
 };
 
-// Kernel implementations
-__global__ void parallel_work_kernel(int stream_id) {
+// Kernel implementations for synchronization demo
+inline __global__ void parallel_work_kernel(int stream_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Simulate different amounts of work per stream
     for (int i = 0; i < (stream_id + 1) * 100; i++) {
         float dummy = sin(tid * 0.01f + i);
     }
-    if (tid == 0) printf("Stream %d parallel work complete\n", stream_id);
+
+    if (tid == 0) {
+        printf("Stream %d parallel work complete\n", stream_id);
+    }
 }
 
-__global__ void join_work_kernel() {
+inline __global__ void join_work_kernel() {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Work that depends on all parallel streams completing
     float result = cos(tid * 0.01f);
-    if (tid == 0) printf("Join work complete\n");
+
+    if (tid == 0) {
+        printf("Join work complete\n");
+    }
 }
 
-__global__ void pipeline_stage_kernel(int stage, int iteration) {
+inline __global__ void pipeline_stage_kernel(int stage, int iteration) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Stage-specific processing
     float result = sin(tid * stage * iteration * 0.001f);
-    if (tid == 0) printf("Stage %d, iteration %d complete\n", stage, iteration);
+
+    if (tid == 0) {
+        printf("Stage %d, iteration %d complete\n", stage, iteration);
+    }
 }
 
-__global__ void initial_processing_kernel() {
+inline __global__ void initial_processing_kernel() {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Initial data processing
     float result = tid * 0.01f;
-    if (tid == 0) printf("Initial processing complete\n");
+
+    if (tid == 0) {
+        printf("Initial processing complete\n");
+    }
 }
 
-__global__ void parallel_processing_kernel(int branch_id) {
+inline __global__ void parallel_processing_kernel(int branch_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Branch-specific processing
     float result = sin(tid * branch_id * 0.01f);
-    if (tid == 0) printf("Parallel processing branch %d complete\n", branch_id);
+
+    if (tid == 0) {
+        printf("Parallel processing branch %d complete\n", branch_id);
+    }
 }
 
-__global__ void aggregation_kernel() {
+inline __global__ void aggregation_kernel() {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
+
+    // Final aggregation
     float result = cos(tid * 0.01f);
-    if (tid == 0) printf("Aggregation complete\n");
+
+    if (tid == 0) {
+        printf("Aggregation complete\n");
+    }
 }
+
+#endif // STREAM_SYNCHRONIZER_CUH

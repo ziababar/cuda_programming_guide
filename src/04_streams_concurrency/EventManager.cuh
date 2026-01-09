@@ -1,14 +1,17 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef EVENT_MANAGER_CUH
+#define EVENT_MANAGER_CUH
+
 #include <vector>
 #include <string>
-#include <queue>
 #include <map>
+#include <queue>
 #include <chrono>
+#include <thread>
 #include <cstdio>
-#include <algorithm>
+#include <cmath>
 
-__global__ void event_demo_kernel(float* data, int N, int kernel_id);
+// Forward declaration
+inline __global__ void event_demo_kernel(float* data, int N, int kernel_id);
 
 // Advanced event management system for complex applications
 class EventManager {
@@ -235,7 +238,100 @@ public:
     }
 };
 
-__global__ void event_demo_kernel(float* data, int N, int kernel_id) {
+// Demonstrate different event types and their characteristics
+inline void demonstrate_event_types() {
+    printf("=== CUDA Event Types Demonstration ===\n");
+
+    EventManager manager(16);
+
+    // Create different types of events
+    int default_event = manager.create_event("default_event", cudaEventDefault, true);
+    int blocking_sync_event = manager.create_event("blocking_sync", cudaEventBlockingSync, true);
+    int disable_timing_event = manager.create_event("no_timing", cudaEventDisableTiming, false);
+    int interprocess_event = manager.create_event("interprocess", cudaEventInterprocess, true);
+
+    // Create streams for testing
+    cudaStream_t stream1, stream2;
+    cudaStreamCreate(&stream1);
+    cudaStreamCreate(&stream2);
+
+    // Test data
+    const int N = 1024 * 1024;
+    float *d_data1, *d_data2;
+    cudaMalloc(&d_data1, N * sizeof(float));
+    cudaMalloc(&d_data2, N * sizeof(float));
+
+    printf("\n1. Testing Default Event (cudaEventDefault):\n");
+    printf("   - Standard event with timing capability\n");
+    printf("   - Non-blocking host synchronization\n");
+
+    manager.record_event("default_event", stream1);
+    event_demo_kernel<<<(N+255)/256, 256, 0, stream1>>>(d_data1, N, 1);
+    manager.record_event("default_event", stream1);
+
+    // Check completion status
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    bool complete = manager.is_event_complete("default_event");
+    printf("   Event complete after 10ms: %s\n", complete ? "yes" : "no");
+
+    manager.synchronize_event("default_event");
+    printf("   Event synchronized successfully\n");
+
+    printf("\n2. Testing Blocking Sync Event (cudaEventBlockingSync):\n");
+    printf("   - Uses blocking synchronization (lower CPU usage)\n");
+    printf("   - More efficient for host threads that wait\n");
+
+    manager.record_event("blocking_sync", stream2);
+    event_demo_kernel<<<(N+255)/256, 256, 0, stream2>>>(d_data2, N, 2);
+    manager.record_event("blocking_sync", stream2);
+
+    auto sync_start = std::chrono::high_resolution_clock::now();
+    manager.synchronize_event("blocking_sync");
+    auto sync_end = std::chrono::high_resolution_clock::now();
+
+    auto sync_time = std::chrono::duration_cast<std::chrono::microseconds>(sync_end - sync_start);
+    printf("   Blocking sync time: %ld μs\n", sync_time.count());
+
+    printf("\n3. Testing Timing-Disabled Event (cudaEventDisableTiming):\n");
+    printf("   - Lower overhead, no timing capability\n");
+    printf("   - Optimized for synchronization-only use cases\n");
+
+    manager.record_event("no_timing", stream1);
+    event_demo_kernel<<<(N+255)/256, 256, 0, stream1>>>(d_data1, N, 3);
+
+    // Try to measure time (should fail gracefully)
+    float invalid_time = manager.get_elapsed_time("no_timing", "default_event");
+    printf("   Timing measurement result: %.3f ms (expected: -1.0)\n", invalid_time);
+
+    printf("\n4. Inter-Stream Dependencies:\n");
+    printf("   Using events to coordinate between streams\n");
+
+    // Stream 1 does initial work
+    manager.record_event("stream1_complete", stream1);
+    event_demo_kernel<<<(N+255)/256, 256, 0, stream1>>>(d_data1, N, 4);
+    manager.record_event("stream1_complete", stream1);
+
+    // Stream 2 waits for Stream 1 to complete
+    manager.stream_wait_event(stream2, "stream1_complete");
+    event_demo_kernel<<<(N+255)/256, 256, 0, stream2>>>(d_data2, N, 5);
+
+    // Synchronize both streams
+    cudaStreamSynchronize(stream1);
+    cudaStreamSynchronize(stream2);
+
+    printf("   Inter-stream dependency executed successfully\n");
+
+    // Print final statistics
+    manager.print_event_statistics();
+
+    // Cleanup
+    cudaStreamDestroy(stream1);
+    cudaStreamDestroy(stream2);
+    cudaFree(d_data1);
+    cudaFree(d_data2);
+}
+
+inline __global__ void event_demo_kernel(float* data, int N, int kernel_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
 
     if (tid < N) {
@@ -254,3 +350,5 @@ __global__ void event_demo_kernel(float* data, int N, int kernel_id) {
         printf("Kernel %d execution complete\n", kernel_id);
     }
 }
+
+#endif // EVENT_MANAGER_CUH

@@ -1,19 +1,16 @@
-#pragma once
-#include <cuda_runtime.h>
+#ifndef STREAM_PRODUCER_CONSUMER_CUH
+#define STREAM_PRODUCER_CONSUMER_CUH
+
 #include <vector>
 #include <queue>
-#include <cstdio>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <atomic>
+#include <cstdio>
 
-// Forward declarations of kernels
-template<typename T>
-__global__ void producer_kernel(T* output, int N, int item_id);
-
-template<typename T>
-__global__ void consumer_kernel(T* input, int N, int sequence);
+// Forward declarations
+inline __global__ void producer_kernel(float* output, int N, int item_id);
+inline __global__ void consumer_kernel(float* input, int N, int sequence);
 
 // Advanced producer-consumer pattern with dynamic buffering
 template<typename T>
@@ -105,6 +102,13 @@ public:
         producer_queue.pop();
 
         BufferSlot& slot = buffer_ring[buffer_id];
+
+        // Wait for the consumer to finish using this buffer
+        // Note: First use sequence_number is -1, so no event wait needed
+        if (slot.sequence_number != -1) {
+            cudaStreamWaitEvent(producer_stream, slot.consumed_event, 0);
+        }
+
         slot.data_size = data_size;
         slot.sequence_number = sequence_counter++;
         slot.is_producer_ready = false;
@@ -256,22 +260,111 @@ public:
     }
 };
 
+// Producer function for demonstration
 template<typename T>
-__global__ void producer_kernel(T* output, int N, int item_id) {
+void producer_worker(StreamProducerConsumer<T>& system, int num_items) {
+    printf("Producer worker started (will produce %d items)\n", num_items);
+
+    for (int i = 0; i < num_items; i++) {
+        int buffer_id;
+        size_t data_size = sizeof(T) * 1024; // 1K elements
+
+        T* buffer = system.get_producer_buffer(data_size, buffer_id);
+        if (!buffer) {
+            printf("Producer: Failed to get buffer, shutting down\n");
+            break;
+        }
+
+        // Simulate data generation work
+        producer_kernel<<<64, 16, 0, system.get_producer_stream()>>>(
+            buffer, 1024, i);
+
+        // Submit for consumption
+        system.submit_producer_buffer(buffer_id);
+
+        // Simulate variable production rate
+        std::this_thread::sleep_for(std::chrono::milliseconds(10 + (i % 20)));
+    }
+
+    printf("Producer worker completed\n");
+}
+
+// Consumer function for demonstration
+template<typename T>
+void consumer_worker(StreamProducerConsumer<T>& system, int num_items) {
+    printf("Consumer worker started (will consume %d items)\n", num_items);
+
+    for (int i = 0; i < num_items; i++) {
+        int buffer_id, sequence;
+        size_t data_size;
+
+        T* buffer = system.get_consumer_buffer(buffer_id, data_size, sequence);
+        if (!buffer) {
+            printf("Consumer: Failed to get buffer, shutting down\n");
+            break;
+        }
+
+        // Simulate data processing work
+        consumer_kernel<<<64, 16, 0, system.get_consumer_stream()>>>(
+            buffer, data_size / sizeof(T), sequence);
+
+        // Release buffer
+        system.release_consumer_buffer(buffer_id);
+
+        // Simulate variable consumption rate
+        std::this_thread::sleep_for(std::chrono::milliseconds(15 + (i % 15)));
+    }
+
+    printf("Consumer worker completed\n");
+}
+
+// Demonstrate producer-consumer pattern
+inline void demonstrate_producer_consumer_pattern() {
+    printf("=== Producer-Consumer Pattern Demo ===\n");
+
+    const int num_items = 20;
+    StreamProducerConsumer<float> system(1024 * sizeof(float), 6);
+
+    // Launch producer and consumer in separate threads
+    std::thread producer_thread(producer_worker<float>, std::ref(system), num_items);
+    std::thread consumer_thread(consumer_worker<float>, std::ref(system), num_items);
+
+    // Monitor system for a while
+    for (int i = 0; i < 10; i++) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        system.print_statistics();
+    }
+
+    // Wait for completion
+    producer_thread.join();
+    consumer_thread.join();
+
+    // Final statistics
+    system.print_statistics();
+}
+
+inline __global__ void producer_kernel(float* output, int N, int item_id) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         output[tid] = item_id + tid * 0.001f;
     }
-    if (tid == 0) printf("GPU Producer: Generated item %d\n", item_id);
+
+    if (tid == 0) {
+        printf("GPU Producer: Generated item %d\n", item_id);
+    }
 }
 
-template<typename T>
-__global__ void consumer_kernel(T* input, int N, int sequence) {
+inline __global__ void consumer_kernel(float* input, int N, int sequence) {
     int tid = threadIdx.x + blockIdx.x * blockDim.x;
     if (tid < N) {
         float value = input[tid];
         // Simulate processing
         input[tid] = value * 2.0f + 1.0f;
     }
-    if (tid == 0) printf("GPU Consumer: Processed sequence %d\n", sequence);
+
+    if (tid == 0) {
+        printf("GPU Consumer: Processed sequence %d\n", sequence);
+    }
 }
+
+#endif // STREAM_PRODUCER_CONSUMER_CUH

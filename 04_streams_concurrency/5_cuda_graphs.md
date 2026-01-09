@@ -2,26 +2,30 @@
 
 CUDA Graphs represent a paradigm shift from dynamic kernel launches to static execution graphs, enabling dramatic performance improvements for repetitive workloads by reducing launch overhead and enabling advanced optimizations.
 
+**[Back to Streams & Concurrency Index](1_cuda_streams_concurrency.md)**
+
+---
+
 ## Graph Fundamentals and Architecture
+
+CUDA Graphs capture sequences of GPU operations into a static directed acyclic graph (DAG), allowing the CUDA runtime to optimize execution and minimize overhead.
 
 ### Comprehensive Graph Management System
 
-The `GraphManager` class handles capturing, instantiating, launching, and updating CUDA Graphs.
-
-**Source Code**: [`../src/04_streams_concurrency/graph_manager.cuh`](../src/04_streams_concurrency/graph_manager.cuh)
+**Code Example:** [`GraphManager.cuh`](../src/04_streams_concurrency/GraphManager.cuh)
 
 ## Advanced Graph Patterns and Optimization
 
 ### Dynamic Graph Updates and Parameter Modification
 
-`AdvancedGraphPatterns` demonstrates creating parameterized graphs, multi-stream graphs, and conditional execution graphs.
+Graphs can be updated with new parameters or kernel arguments without rebuilding the entire graph structure.
 
-**Source Code**: [`../src/04_streams_concurrency/advanced_graph_patterns.cuh`](../src/04_streams_concurrency/advanced_graph_patterns.cuh)
+**Code Example:** [`AdvancedGraphPatterns.cuh`](../src/04_streams_concurrency/AdvancedGraphPatterns.cuh)
 
 ## Production Graph Optimization Strategies
 
 ### Enterprise-Grade Graph Management
 
-`ProductionGraphOptimizer` includes logic to optimize execution order of multiple graphs and analyze performance stability.
+Optimizing execution order and batching graphs can lead to further performance gains in production environments.
 
-**Source Code**: [`../src/04_streams_concurrency/production_graph_optimizer.cuh`](../src/04_streams_concurrency/production_graph_optimizer.cuh)
+**Code Example:** [`ProductionGraphOptimizer.cuh`](../src/04_streams_concurrency/ProductionGraphOptimizer.cuh)
