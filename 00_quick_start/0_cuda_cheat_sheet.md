@@ -200,6 +200,32 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 ---
 
+## 8. Common Errors Lookup
+
+| Error Code/Name | Possible Cause | Solution |
+|-----------------|----------------|----------|
+| `cudaErrorInvalidConfiguration` | Invalid grid/block dimensions | Check `dim3` values against device limits |
+| `cudaErrorMemoryAllocation` | OOM (Out of Memory) | Reduce batch size, check for leaks, use Unified Memory |
+| `cudaErrorLaunchFailure` | Segfault in kernel (e.g. out of bounds) | Use `cuda-memcheck` or Compute Sanitizer |
+| `cudaErrorIllegalAddress` | Accessing invalid memory address | Verify array bounds and pointer validity |
+| `cudaErrorMisalignedAddress` | Misaligned memory access | Ensure types are naturally aligned |
+| `cudaErrorDeviceSynchronize` | Error in previous async call | Check previous kernel launches/copies |
+
+---
+
+## 9. Performance Checklist
+
+- [ ] **Occupancy**: Is my occupancy high enough to hide latency? (Check w/ Nsight Compute)
+- [ ] **Coalescing**: Are global memory accesses coalesced?
+- [ ] **Shared Memory**: Am I using shared memory to reduce global bandwidth?
+- [ ] **Bank Conflicts**: Are shared memory accesses free of bank conflicts?
+- [ ] **Divergence**: Are warps executing same path? (Avoid `if-else` divergence)
+- [ ] **Streams**: Am I using streams to overlap copy and compute?
+- [ ] **Pinned Memory**: Am I using `cudaHostAlloc` for host buffers in async copies?
+- [ ] **Launch Bounds**: Have I tuned `__launch_bounds__` for register usage?
+
+---
+
 ##  Key Code Snippets
 
 ```cpp
@@ -215,4 +241,3 @@ __syncthreads();
 // Async Copy
 cudaMemcpyAsync(dst, src, size, cudaMemcpyHostToDevice, stream);
 ```
-  |
