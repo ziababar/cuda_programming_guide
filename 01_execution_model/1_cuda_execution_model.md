@@ -234,7 +234,7 @@ GPU Performance Issue?
  Indexing or memory access issues?
     Review thread hierarchy → [ Thread Guide](2_thread_hierarchy.md)
  Need optimization examples?
-     Study performance patterns → [ Examples Guide](1f_performance_examples.md)
+     Study performance patterns → [Optimization Strategies](../05_performance_profiling/5_optimization_strategies.md)
 ```
 
 ##  **Key Principles**

@@ -917,24 +917,24 @@ void demonstrate_event_coordination() {
     cudaMalloc(&d_temp, N * sizeof(float));
 
     // Define work functions
-    auto init_data = [=](cudaStream_t stream) {
+    auto init_data = \[=\](cudaStream_t stream) {
         cudaMemsetAsync(d_data1, 0, N * sizeof(float), stream);
         initialization_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data1, N);
     };
 
-    auto process_stage1 = [=](cudaStream_t stream) {
+    auto process_stage1 = \[=\](cudaStream_t stream) {
         complex_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data1, d_data2, N);
     };
 
-    auto process_stage2a = [=](cudaStream_t stream) {
+    auto process_stage2a = \[=\](cudaStream_t stream) {
         simple_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data2, d_data3, N);
     };
 
-    auto process_stage2b = [=](cudaStream_t stream) {
+    auto process_stage2b = \[=\](cudaStream_t stream) {
         complex_math_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data2, d_temp, N);
     };
 
-    auto final_combine = [=](cudaStream_t stream) {
+    auto final_combine = \[=\](cudaStream_t stream) {
         combine_kernel<<<(N+255)/256, 256, 0, stream>>>(d_data3, d_temp, d_data4, N);
     };
 

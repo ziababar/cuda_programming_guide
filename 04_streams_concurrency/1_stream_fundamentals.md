@@ -12,13 +12,13 @@ CUDA streams represent ordered sequences of GPU operations that execute asynchro
 
 The following code demonstrates the fundamentals of CUDA streams, including default stream behavior, explicit stream creation, and priority configuration.
 
-**Code Example:** [`stream_fundamentals.cuh`](../src/04_streams_concurrency/stream_fundamentals.cuh)
+**Code Example:** [`1_stream_fundamentals.cuh`](../src/04_streams_concurrency/1_stream_fundamentals.cuh)
 
 ### Stream Execution Model
 
 Streams allow for FIFO ordering within a single stream, while enabling concurrency between different streams.
 
-**Code Example:** [`stream_execution.cuh`](../src/04_streams_concurrency/stream_execution.cuh)
+**Code Example:** [`1_stream_fundamentals.cuh`](../src/04_streams_concurrency/1_stream_fundamentals.cuh)
 
 ### Stream Management Patterns
 

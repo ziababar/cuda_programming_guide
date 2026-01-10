@@ -314,7 +314,7 @@ public:
 
     void optimize_for_access_pattern(void* ptr, int device_id, bool is_write) {
         auto it = std::find_if(managed_regions.begin(), managed_regions.end(),
-                              [ptr](const MemoryRegion& r) { return r.ptr == ptr; });
+                              \[ptr\](const MemoryRegion& r) { return r.ptr == ptr; });
 
         if (it != managed_regions.end()) {
             it->access_count[device_id]++;

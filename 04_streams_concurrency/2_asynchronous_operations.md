@@ -12,13 +12,13 @@ The ability to overlap computation with memory transfers is one of the most powe
 
 ### Basic Overlap Patterns
 
-**Code Example:** [`compute_transfer_overlap.cuh`](../src/04_streams_concurrency/compute_transfer_overlap.cuh)
+**Code Example:** [`2_asynchronous_operations.cuh`](../src/04_streams_concurrency/2_asynchronous_operations.cuh)
 
 ### Advanced Pipeline Processing
 
 Pipelines allow for processing data in stages, keeping both the compute and copy engines busy.
 
-**Code Example:** [`pipeline_processing.cuh`](../src/04_streams_concurrency/pipeline_processing.cuh)
+**Code Example:** [`StreamPipeline.cuh`](../src/04_streams_concurrency/StreamPipeline.cuh)
 
 ## Stream Synchronization Mechanisms
 
