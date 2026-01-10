@@ -53,61 +53,34 @@ __global__ void barrier_synchronization_demo() {
 }
 ```
 
-#### **Producer-Consumer Pattern:**
+#### **Parallel Reduction (Safe Block Sync Pattern):**
 ```cpp
-// Producer-consumer synchronization with shared memory
-__global__ void producer_consumer_demo() {
-    __shared__ float buffer[128];
-    __shared__ int write_pos;
-    __shared__ int read_pos;
-    __shared__ int data_count;
-
+// Correct pattern: All threads participate in the barrier
+__global__ void reduction_demo(float* input, float* output) {
+    __shared__ float sdata[256];
     int tid = threadIdx.x;
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
 
-    // Initialize shared variables
+    // Load data
+    sdata[tid] = input[idx];
+    __syncthreads(); // Barrier 1: Wait for load
+
+    // Reduction in shared memory
+    // Note: All threads execute the loop, even if they don't do work in later iterations.
+    // However, __syncthreads() MUST be reached by all active threads in the block.
+    for (int stride = blockDim.x / 2; stride > 0; stride >>= 1) {
+        if (tid < stride) {
+            sdata[tid] += sdata[tid + stride];
+        }
+        // Essential: All threads reach this barrier in every iteration
+        __syncthreads();
+    }
+
+    // Write result
     if (tid == 0) {
-        write_pos = 0;
-        read_pos = 0;
-        data_count = 0;
-    }
-    __syncthreads();
-
-    // Producer threads (first half)
-    if (tid < blockDim.x / 2) {
-        for (int i = 0; i < 4; i++) {  // Each producer creates 4 items
-            float data = tid * 4 + i;
-
-            // Wait for buffer space
-            while (data_count >= 128) {
-                __syncthreads();
-            }
-
-            // Produce data
-            int pos = atomicAdd(&write_pos, 1) % 128;
-            buffer[pos] = data;
-            atomicAdd(&data_count, 1);
-
-            __syncthreads();
-        }
-    }
-    // Consumer threads (second half)
-    else {
-        for (int i = 0; i < 2; i++) {  // Each consumer processes 2 items
-            // Wait for data
-            while (data_count <= 0) {
-                __syncthreads();
-            }
-
-            // Consume data
-            int pos = atomicAdd(&read_pos, 1) % 128;
-            float data = buffer[pos];
-            atomicSub(&data_count, 1);
-
-            // Process data
-            printf("Consumer %d processed: %.1f\n", tid, data);
-
-            __syncthreads();
-        }
+        output[blockIdx.x] = sdata[0];
     }
 }
 ```
+
+> **Warning**: Avoid placing `__syncthreads()` inside divergent branches (e.g., `if (tid < 16) { ... __syncthreads(); } else { ... }`). This can cause deadlocks because the barrier waits for *all* threads in the block to reach it.

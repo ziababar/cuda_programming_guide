@@ -55,6 +55,8 @@ Memory Transaction:   |------------ Single 128-byte load ------------|
  Result: 1 memory transaction serves entire warp (32 floats = 128 bytes)
 ```
 
+> **Note on Vectorized Access**: For `float4` (16 bytes/thread), a warp requests 32 * 16 = 512 bytes. This will result in 4 memory transactions of 128 bytes each. It is still considered "coalesced" and highly efficient because the transactions are fully utilized and contiguous.
+
 ###  **Stride-1 Access (Optimal)**
 ```cpp
 // Thread 0 accesses data[0], Thread 1 accesses data[1], etc.

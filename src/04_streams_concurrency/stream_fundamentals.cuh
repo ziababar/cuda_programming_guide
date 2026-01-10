@@ -15,7 +15,8 @@ inline void demonstrate_stream_fundamentals() {
     // 1. Default Stream (Stream 0) - Synchronous Behavior
     printf("1. Default Stream Characteristics:\n");
     printf("   - Synchronous with host\n");
-    printf("   - Blocks other streams until completion\n");
+    printf("   - Blocks other streams until completion (Legacy Mode)\n");
+    printf("   - NOTE: Compile with --default-stream per-thread to change this behavior\n");
     printf("   - Used when no explicit stream specified\n\n");
 
     float *d_data1, *d_data2;

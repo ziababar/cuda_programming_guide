@@ -153,9 +153,9 @@ __global__ void vectorAdd(float* A, float* B, float* C, int N) {
 
 | Tool               | Use Case                             |
 |--------------------|--------------------------------------|
-| `nvprof`           | Basic kernel and memory profiling    |
-| **Nsight Compute** | Kernel-level performance analysis    |
 | **Nsight Systems** | Full system profiling (timeline)     |
+| **Nsight Compute** | Kernel-level performance analysis    |
+| `compute-sanitizer`| Memory error checker (replaces cuda-memcheck) |
 | `cuda-gdb`         | Debugger for CUDA code               |
 
 ###  Optimization Metrics
