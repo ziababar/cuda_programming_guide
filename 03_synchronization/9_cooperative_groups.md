@@ -62,6 +62,57 @@ __global__ void cooperative_block_reduction(float* data, float* output, int N) {
 
 ---
 
+## **Cooperative Groups Hierarchy**
+
+Cooperative Groups provides a flexible hierarchy for thread synchronization at different scopes:
+
+```mermaid
+graph TB
+    subgraph "Grid Group"
+        GG[Grid Group<br/>this_grid]
+
+        subgraph "Thread Block 0"
+            TB0[Thread Block Group<br/>this_thread_block]
+
+            subgraph "Warp-Level"
+                W0_32[Tile<32><br/>Full Warp]
+                W0_16a[Tile<16>]
+                W0_16b[Tile<16>]
+                W0_8[Tile<8>]
+            end
+        end
+
+        subgraph "Thread Block 1"
+            TB1[Thread Block Group<br/>this_thread_block]
+
+            subgraph "Warp-Level "
+                W1_32[Tile<32><br/>Full Warp]
+            end
+        end
+
+        GG --> TB0
+        GG --> TB1
+        TB0 --> W0_32
+        W0_32 --> W0_16a
+        W0_32 --> W0_16b
+        W0_16a --> W0_8
+    end
+
+    style GG fill:#ffe1e1
+    style TB0 fill:#e1f5ff
+    style TB1 fill:#e1f5ff
+    style W0_32 fill:#90EE90
+    style W1_32 fill:#90EE90
+    style W0_16a fill:#fff4e1
+    style W0_16b fill:#fff4e1
+    style W0_8 fill:#ffff99
+```
+
+**Key Features:**
+- **Grid Groups**: Synchronize across entire kernel launch (requires cooperative launch)
+- **Thread Block Groups**: Traditional block-level synchronization (replaces `__syncthreads()`)
+- **Tiled Partitions**: Sub-warp or warp-level synchronization (2, 4, 8, 16, 32 threads)
+
 ## **Tiled Partitions**
 
 Tiled partitions break a thread block into smaller, independent sub-groups (tiles). This is highly efficient for warp-level operations and avoids the complexity of warp intrinsics (`__shfl`).

@@ -22,6 +22,64 @@ The CUDA thread hierarchy is the foundation of GPU parallel programming. Underst
 
 CUDA organizes parallel execution in a four-level hierarchy that maps directly to GPU hardware capabilities. Each level serves a specific purpose in the overall execution model.
 
+```mermaid
+graph TB
+    subgraph Grid["Grid (Kernel Launch)"]
+        subgraph Block0["Block (0,0)"]
+            subgraph Warp0_0["Warp 0"]
+                T0_0["Threads 0-31"]
+            end
+            subgraph Warp1_0["Warp 1"]
+                T1_0["Threads 32-63"]
+            end
+            SM0["Shared Memory<br/>48-164 KB"]
+        end
+
+        subgraph Block1["Block (1,0)"]
+            subgraph Warp0_1["Warp 0"]
+                T0_1["Threads 0-31"]
+            end
+            subgraph Warp1_1["Warp 1"]
+                T1_1["Threads 32-63"]
+            end
+            SM1["Shared Memory<br/>48-164 KB"]
+        end
+
+        subgraph Block2["Block (2,0)"]
+            subgraph Warp0_2["Warp 0"]
+                T0_2["Threads 0-31"]
+            end
+            subgraph Warp1_2["Warp 1"]
+                T1_2["Threads 32-63"]
+            end
+            SM2["Shared Memory<br/>48-164 KB"]
+        end
+    end
+
+    GM[Global Memory<br/>Accessible by all threads]
+
+    Block0 --> GPU0[SM 0]
+    Block1 --> GPU1[SM 1]
+    Block2 --> GPU2[SM 2]
+
+    GPU0 --> GM
+    GPU1 --> GM
+    GPU2 --> GM
+
+    style Block0 fill:#e1f5ff
+    style Block1 fill:#e1f5ff
+    style Block2 fill:#e1f5ff
+    style Warp0_0 fill:#fff4e1
+    style Warp1_0 fill:#fff4e1
+    style GM fill:#ffe1e1
+```
+
+**Key Relationships:**
+- **Grid** → Contains multiple **Blocks**
+- **Block** → Contains multiple **Warps** (groups of 32 threads)
+- **Warp** → Contains 32 **Threads** that execute in lockstep
+- Each **Block** maps to an **SM** (Streaming Multiprocessor)
+
 ###  **Complete Hierarchy Breakdown**
 
 | Level | Size Range | Hardware Mapping | Memory Scope | Synchronization | Lifetime |

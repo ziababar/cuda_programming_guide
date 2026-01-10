@@ -121,6 +121,41 @@ __global__ void independent_scheduling_demo() {
 
 Understanding how warps are scheduled helps optimize kernel performance and resource utilization.
 
+```mermaid
+graph LR
+    subgraph "Streaming Multiprocessor"
+        WS[Warp Scheduler]
+
+        subgraph "Ready Warps Pool"
+            W0[Warp 0<br/>Ready]
+            W1[Warp 1<br/>Ready]
+            W2[Warp 2<br/>Stalled]
+            W3[Warp 3<br/>Ready]
+        end
+
+        subgraph "Execution Units"
+            CU[CUDA Cores]
+            SFU[Special Function Units]
+            LDST[Load/Store Units]
+        end
+
+        WS --> W0
+        WS --> W1
+        WS --> W3
+        W0 --> CU
+        W1 --> CU
+        W3 --> SFU
+
+        style W0 fill:#90EE90
+        style W1 fill:#90EE90
+        style W2 fill:#ff9999
+        style W3 fill:#90EE90
+        style WS fill:#ffff99
+    end
+```
+
+**Key Insight:** Multiple ready warps hide latency by keeping execution units busy while others wait for memory or synchronization.
+
 ###  **Scheduling Algorithm**
 
 The warp scheduler uses a sophisticated algorithm to maximize throughput:
@@ -265,6 +300,30 @@ void test_occupancy_impact() {
 ##  **Divergence Analysis and Optimization**
 
 Warp divergence is one of the most significant performance bottlenecks in CUDA. Understanding and minimizing divergence is crucial for optimal performance.
+
+```mermaid
+sequenceDiagram
+    participant W as Warp (32 threads)
+    participant P1 as Path A (threads 0-15)
+    participant P2 as Path B (threads 16-31)
+
+    Note over W: if (tid < 16)
+    W->>P1: Execute Path A
+    Note over P2: Threads 16-31 IDLE
+    P1->>W: Path A complete
+
+    W->>P2: Execute Path B
+    Note over P1: Threads 0-15 IDLE
+    P2->>W: Path B complete
+
+    Note over W: Reconverge<br/>All threads active
+
+    rect rgb(255, 200, 200)
+        Note right of W: Total Time = Time(A) + Time(B)<br/>Wasted cycles = 50%
+    end
+```
+
+**Performance Impact:** Divergent branches execute serially, effectively reducing parallelism by the number of divergent paths.
 
 ###  **Understanding Divergence**
 

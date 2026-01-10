@@ -22,6 +22,51 @@ Global memory is the main data reservoir for CUDA kernels, but it's slow. This g
 
 Memory coalescing is the process by which threads in a warp (32 threads) access consecutive memory addresses, allowing the GPU to service these memory requests using fewer memory transactions. It is a fundamental performance optimization for global memory access.
 
+```mermaid
+graph TB
+    subgraph "Coalesced Access (Good)"
+        W1[Warp: 32 Threads]
+        W1 --> MA1[Memory Access<br/>Sequential: 0,1,2...31]
+        MA1 --> T1[1-2 Transactions<br/>~400-800 cycles total]
+
+        style MA1 fill:#90EE90
+        style T1 fill:#90EE90
+    end
+
+    subgraph "Non-Coalesced Access (Bad)"
+        W2[Warp: 32 Threads]
+        W2 --> MA2[Memory Access<br/>Random: 100,500,50...999]
+        MA2 --> T2[Up to 32 Transactions<br/>~12,800 cycles total]
+
+        style MA2 fill:#ff9999
+        style T2 fill:#ff9999
+    end
+```
+
+```mermaid
+graph LR
+    subgraph "Coalesced Pattern"
+        T0["Thread 0<br/>data[0]"] --> M1[128-byte<br/>Transaction]
+        T1["Thread 1<br/>data[1]"] --> M1
+        T2["Thread 2<br/>data[2]"] --> M1
+        T31["Thread 31<br/>data[31]"] --> M1
+
+        style M1 fill:#90EE90
+    end
+
+    subgraph "Strided Pattern (Poor)"
+        TS0["Thread 0<br/>data[0]"] --> MS1[Transaction 1]
+        TS1["Thread 1<br/>data[64]"] --> MS2[Transaction 2]
+        TS2["Thread 2<br/>data[128]"] --> MS3[Transaction 3]
+        TS31["Thread 31<br/>data[1984]"] --> MS32[Transaction 32]
+
+        style MS1 fill:#ff9999
+        style MS2 fill:#ff9999
+        style MS3 fill:#ff9999
+        style MS32 fill:#ff9999
+    end
+```
+
 ###  **Performance Impact**
 - **Coalesced access**: 1-2 memory transactions per warp
 - **Non-coalesced access**: Up to 32 separate transactions per warp

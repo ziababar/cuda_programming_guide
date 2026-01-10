@@ -17,6 +17,49 @@ Understanding the CUDA memory hierarchy is **critical** for writing performant k
 
 ---
 
+##  **Memory Hierarchy Overview**
+
+The CUDA memory hierarchy is organized by access speed, scope, and size. Understanding this hierarchy is essential for optimal performance:
+
+```mermaid
+graph TB
+    subgraph "Fast & Small"
+        A[Registers<br/>~1 cycle<br/>32-255 per thread]
+        B[Shared Memory<br/>~2-3 cycles<br/>48-164 KB per block]
+    end
+
+    subgraph "Medium Speed"
+        C[L1 Cache<br/>~10 cycles<br/>Shared with Shared Mem]
+        D[L2 Cache<br/>~100 cycles<br/>1-40 MB]
+    end
+
+    subgraph "Slow & Large"
+        E[Global Memory<br/>300-600 cycles<br/>Up to 80 GB]
+        F[Constant Memory<br/>~1 cycle cached<br/>64 KB]
+    end
+
+    subgraph "Host"
+        G[System RAM<br/>PCIe latency<br/>Unlimited]
+    end
+
+    A --> C
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+    E --> G
+
+    style A fill:#00ff00
+    style B fill:#90EE90
+    style C fill:#ffff99
+    style D fill:#ffcc99
+    style E fill:#ff9999
+    style F fill:#99ccff
+    style G fill:#cccccc
+```
+
+**Key Principle:** Keep data in faster memory tiers as long as possible!
+
 ##  **Memory Types Complete Reference**
 
 | Memory Type | Latency | Size Limit | Scope | Lifetime | Access Pattern | Best For | Detailed Guide |
