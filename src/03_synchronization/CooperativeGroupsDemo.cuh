@@ -3,83 +3,69 @@
 
 #include <cooperative_groups.h>
 #include <cstdio>
-#include <cmath>
+#include <vector>
+#include <cuda_runtime.h>
 
 namespace cg = cooperative_groups;
 
-namespace CooperativeGroupsDemo {
+// Demonstrate Thread Block Group
+__global__ void thread_block_group_kernel() {
+    cg::thread_block tb = cg::this_thread_block();
 
-// Thread Block Group Example
-__global__ void cooperative_block_reduction(float* data, float* output, int N) {
-    cg::thread_block cta = cg::this_thread_block();
-    int tid = cta.thread_rank();
+    // Synchronize all threads in the block
+    tb.sync();
 
-    extern __shared__ float sdata[];
+    if (tb.thread_rank() == 0) {
+        printf("Thread Block Group: Block %d, Thread %d (Rank 0)\n",
+               blockIdx.x, threadIdx.x);
+        printf("  Group Size: %lld\n", tb.size());
+    }
 
-    int idx = blockIdx.x * blockDim.x + tid;
-    sdata[tid] = (idx < N) ? data[idx] : 0.0f;
+    tb.sync();
+}
 
-    cta.sync();
+// Demonstrate Tiled Partition
+__global__ void tiled_partition_demo_kernel(int* data, int size) {
+    cg::thread_block tb = cg::this_thread_block();
+    cg::thread_block_tile<32> tile32 = cg::tiled_partition<32>(tb);
 
-    for (int s = blockDim.x / 2; s > 0; s >>= 1) {
-        if (tid < s) {
-            sdata[tid] += sdata[tid + s];
+    int tid = tb.thread_rank();
+
+    if (tid < size) {
+        int val = data[tid];
+
+        // Parallel reduction within a warp (tile)
+        for (int i = tile32.size() / 2; i > 0; i /= 2) {
+            val += tile32.shfl_down(val, i);
         }
-        cta.sync();
-    }
 
-    if (tid == 0) {
-        output[blockIdx.x] = sdata[0];
-    }
-}
-
-// Tiled Partition Example
-__global__ void tiled_reduction(float* data, float* output) {
-    cg::thread_block cta = cg::this_thread_block();
-    cg::thread_block_tile<32> tile32 = cg::tiled_partition<32>(cta);
-
-    int tid = cta.thread_rank();
-    float val = data[tid];
-
-    for (int i = tile32.size() / 2; i > 0; i /= 2) {
-        val += tile32.shfl_down(val, i);
-    }
-
-    if (tile32.thread_rank() == 0) {
-        output[tid / 32] = val;
+        if (tile32.thread_rank() == 0) {
+            printf("Warp %d reduction result: %d\n", tid / 32, val);
+        }
     }
 }
 
-// Grid Synchronization Example
-__global__ void global_sync_kernel(float* data, int N) {
-    cg::grid_group grid = cg::this_grid();
-    int tid = grid.thread_rank();
+class CooperativeGroupsDemo {
+public:
+    static void run_demos() {
+        printf("=== Cooperative Groups Demo ===\n");
 
-    if (tid < N) {
-        data[tid] = sqrt(data[tid]);
+        printf("\n1. Thread Block Group:\n");
+        thread_block_group_kernel<<<2, 64>>>();
+        cudaDeviceSynchronize();
+
+        printf("\n2. Tiled Partition (Warp Reduction):\n");
+        const int size = 256;
+        std::vector<int> h_data(size, 1); // Fill with 1s
+        int* d_data;
+        cudaMalloc(&d_data, size * sizeof(int));
+        cudaMemcpy(d_data, h_data.data(), size * sizeof(int), cudaMemcpyHostToDevice);
+
+        tiled_partition_demo_kernel<<<1, size>>>(d_data, size);
+        cudaDeviceSynchronize();
+
+        cudaFree(d_data);
     }
-
-    grid.sync();
-
-    if (tid > 0 && tid < N - 1) {
-        float left = data[tid - 1];
-        float right = data[tid + 1];
-        data[tid] = (left + right) * 0.5f;
-    }
-}
-
-// Host helper
-inline void launch_cooperative(float* d_data, int N) {
-    int num_blocks = 32;
-    int threads_per_block = 256;
-
-    void* kernelArgs[] = { &d_data, &N };
-    dim3 dimBlock(threads_per_block, 1, 1);
-    dim3 dimGrid(num_blocks, 1, 1);
-
-    cudaLaunchCooperativeKernel((void*)global_sync_kernel, dimGrid, dimBlock, kernelArgs);
-}
-
-} // namespace CooperativeGroupsDemo
+};
 
 #endif // COOPERATIVE_GROUPS_DEMO_CUH

@@ -51,6 +51,10 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Kernel Launch Tuning](05_performance_profiling/7_kernel_launch_tuning.md)** - Grid and block configuration
 - **[Detecting Bottlenecks](05_performance_profiling/8_detecting_bottlenecks.md)** - Root cause analysis
 
+### Advanced Features - [`06_advanced_features/`](06_advanced_features/)
+- **[Tensor Cores](06_advanced_features/1_tensor_cores.md)** - Mixed-precision matrix operations with WMMA
+- **[Dynamic Parallelism](06_advanced_features/2_dynamic_parallelism.md)** - Launching kernels from the device
+
 ## Learning Path Recommendations
 
 ### **Beginner Path**
