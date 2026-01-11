@@ -53,6 +53,12 @@ __global__ void wave_synchronization(float* data, int* wave_counter,
         }
     }
 }
+
+// NOTE: Modern Approach
+// For safer and more robust synchronization across groups of threads or blocks,
+// consider using Cooperative Groups. It avoids the pitfalls of manual atomic
+// counters and implicit synchronization assumptions.
+// See: [Cooperative Groups](9_cooperative_groups.md)
 ```
 
 #### **Pipeline Synchronization:**

@@ -2,6 +2,8 @@
 
 Cooperative Groups (introduced in CUDA 9.0) provides a flexible model for synchronization and communication within groups of threads. It decouples synchronization from the rigid thread block structure, allowing for safer and more composable parallel algorithms.
 
+> **Note:** Cooperative Groups is the recommended approach for modern CUDA synchronization.
+
 **Previous: [Advanced Patterns](8_advanced_synchronization.md)** | **Next: [Streams & Concurrency](../04_streams_concurrency/1_stream_fundamentals.md)**
 
 ---
