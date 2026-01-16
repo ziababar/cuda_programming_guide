@@ -3,6 +3,7 @@
 - **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
 - **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
 - **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategiesy Hierarchy - Overview & Quick Reference
+- **[Asynchronous Memory Copy](7_async_copy.md)** - `cp.async` and pipeline optimization (Ampere+)
 
 Understanding the CUDA memory hierarchy is **critical** for writing performant kernels. The choice of memory and access pattern dramatically impacts latency, bandwidth utilization, and overall throughput.
 
@@ -14,6 +15,7 @@ Understanding the CUDA memory hierarchy is **critical** for writing performant k
 - **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
 - **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
 - **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategies
+- **[Asynchronous Memory Copy](7_async_copy.md)** - `cp.async` and pipeline optimization (Ampere+)
 
 ---
 
