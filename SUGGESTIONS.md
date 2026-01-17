@@ -22,9 +22,9 @@ After a comprehensive review of the current guide, I have identified several key
     *   Data layout requirements (fragment loading/storing).
 
 ### C. Asynchronous Data Copy (`cp.async` / `memcpy_async`)
-*   **Current State:** There is no mention of `cp.async` or `cuda::memcpy_async`.
-*   **Importance:** Introduced in Ampere (Compute Capability 8.0), `cp.async` allows loading data from Global Memory to Shared Memory asynchronously, bypassing the register file. This is crucial for hiding memory latency in modern high-performance kernels (e.g., GEMM pipelines).
-*   **Recommendation:** Add a section in `02_memory_hierarchy` or `04_streams_concurrency` on "Asynchronous Memory Copy" explaining the `cp.async` pipeline pattern.
+*   **Status:** **Implemented** in `02_memory_hierarchy/7_async_copy.md` and `src/02_memory_hierarchy/AsyncCopyDemo.cuh`.
+*   **Importance:** Introduced in Ampere (Compute Capability 8.0), `cp.async` allows loading data from Global Memory to Shared Memory asynchronously, bypassing the register file.
+*   **Details:** Added comprehensive guide and `cuda::pipeline` demo.
 
 ### D. Dynamic Parallelism (CDP)
 *   **Current State:** Mentioned briefly in the cheat sheet ("Launch kernels from within kernels"), but no examples or deep dive.
