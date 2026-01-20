@@ -2,7 +2,8 @@
 - **[Shared Memory Complete Guide](3_shared_memory.md)** - Matrix multiplication, bank conflicts, benchmarks
 - **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
 - **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
-- **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategiesy Hierarchy - Overview & Quick Reference
+- **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategies
+- **[Asynchronous Copy (cp.async)](7_async_copy.md)** - Ampere+ pipeline optimization
 
 Understanding the CUDA memory hierarchy is **critical** for writing performant kernels. The choice of memory and access pattern dramatically impacts latency, bandwidth utilization, and overall throughput.
 
