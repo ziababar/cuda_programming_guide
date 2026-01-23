@@ -57,3 +57,15 @@ After a comprehensive review of the current guide, I have identified several key
 2.  **Suggest creation of `06_modern_computing`**: For Tensor Cores and Async Copy.
 
 I have created this `SUGGESTIONS.md` file for your review. I will now proceed to implement the `Cooperative Groups` guide as a concrete improvement.
+
+## Status Update (Implemented)
+
+### Completed Items
+*   **Cooperative Groups**: Added `03_synchronization/9_cooperative_groups.md` and ensured content covers `cooperative_groups` namespace, thread blocks, and grid synchronization.
+*   **Tensor Cores**: Added `06_advanced_features/1_tensor_cores.md` with implementation details in `src/06_advanced_features/TensorCoreDemo.cuh`.
+*   **Dynamic Parallelism**: Added `06_advanced_features/2_dynamic_parallelism.md` with implementation in `src/06_advanced_features/DynamicParallelismDemo.cuh`.
+*   **Asynchronous Memory Copy**: Added `02_memory_hierarchy/7_async_copy.md` and implemented a full pipeline demo in `src/02_memory_hierarchy/AsyncCopyDemo.cuh`.
+
+### Pending Items
+*   **Modernization**: Codebase still primarily uses C++11. Future updates should target C++17/20.
+*   **Header Organization**: Review other chapters for missing `.cuh` files.
