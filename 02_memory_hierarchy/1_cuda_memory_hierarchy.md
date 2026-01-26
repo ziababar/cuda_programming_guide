@@ -14,6 +14,7 @@ Understanding the CUDA memory hierarchy is **critical** for writing performant k
 - **[Constant Memory Complete Guide](4_constant_memory.md)** - Domain examples, optimization strategies
 - **[Unified Memory Complete Guide](5_unified_memory.md)** - Advanced techniques, multi-GPU, performance analysis
 - **[Memory Debugging Toolkit](6_memory_debugging.md)** - Troubleshooting workflows and profiling strategies
+- **[Asynchronous Memory Copy](7_async_copy.md)** - Pipeline and cp.async optimization
 
 ---
 
