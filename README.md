@@ -21,6 +21,7 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Constant Memory](02_memory_hierarchy/4_constant_memory.md)** - Broadcast patterns and use cases
 - **[Unified Memory](02_memory_hierarchy/5_unified_memory.md)** - Advanced techniques and multi-GPU
 - **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
+- **[Asynchronous Memory Copy](02_memory_hierarchy/7_async_copy.md)** - Pipelined global-to-shared transfers (Ampere+)
 
 ### Synchronization - [`03_synchronization/`](03_synchronization/)
 - **[Synchronization Fundamentals](03_synchronization/1_synchronization_basics.md)** - Basics of thread coordination
@@ -31,6 +32,7 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Memory Consistency](03_synchronization/6_memory_consistency.md)** - Memory ordering and fences
 - **[Debugging Synchronization](03_synchronization/7_synchronization_debugging.md)** - Tools and techniques
 - **[Advanced Patterns](03_synchronization/8_advanced_synchronization.md)** - Wave and pipeline synchronization
+- **[Cooperative Groups](03_synchronization/9_cooperative_groups.md)** - Flexible intra-block and grid synchronization
 
 ### Streams & Concurrency - [`04_streams_concurrency/`](04_streams_concurrency/)
 - **[CUDA Streams Concurrency](04_streams_concurrency/1_cuda_streams_concurrency.md)** - Index and advanced patterns
