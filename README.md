@@ -21,6 +21,7 @@ A comprehensive, hands-on guide to CUDA programming covering everything from bas
 - **[Constant Memory](02_memory_hierarchy/4_constant_memory.md)** - Broadcast patterns and use cases
 - **[Unified Memory](02_memory_hierarchy/5_unified_memory.md)** - Advanced techniques and multi-GPU
 - **[Memory Debugging](02_memory_hierarchy/6_memory_debugging.md)** - Profiling and troubleshooting
+- **[Asynchronous Memory Copy](02_memory_hierarchy/7_async_copy.md)** - Ampere+ cp.async and pipeline patterns
 
 ### Synchronization - [`03_synchronization/`](03_synchronization/)
 - **[Synchronization Fundamentals](03_synchronization/1_synchronization_basics.md)** - Basics of thread coordination
